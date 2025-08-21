@@ -1,0 +1,37 @@
+package grpcclient
+
+import (
+	"context"
+	"data-vault/client/internal/models"
+	"data-vault/client/internal/proto"
+
+	"google.golang.org/grpc/metadata"
+)
+
+// Get retrieves the original URL using the shortened URL
+func (c *Client) GetData(ctx context.Context, jwt string) ([]models.Data, error) {
+	var resp []models.Data
+
+	md := metadata.New(map[string]string{
+		"authorization": "Bearer " + jwt,
+	})
+	ctx = metadata.NewOutgoingContext(ctx, md)
+
+	req := &proto.GetDataRequest{}
+
+	grpcResp, err := c.ClientConn.GetData(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, d := range grpcResp.Data {
+		resp = append(resp, models.Data{
+			ID:   d.Id,
+			Data: d.Data,
+			Status: d.Status,
+			UploadedAt: d.UploadedAt,
+		})
+	}
+
+	return resp, nil
+}

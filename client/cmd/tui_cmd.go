@@ -1,0 +1,27 @@
+package main
+
+import (
+	"fmt"
+	"os"
+
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/spf13/cobra"
+)
+
+// tuiCmd represents the interactive TUI command
+var tuiCmd = &cobra.Command{
+	Use:   "tui",
+	Short: "Launch interactive TUI mode",
+	Long:  "Launch the interactive Text User Interface for a more user-friendly experience.",
+	Run: func(cmd *cobra.Command, args []string) {
+		p := tea.NewProgram(initialModel(), tea.WithAltScreen())
+		if _, err := p.Run(); err != nil {
+			fmt.Printf("Error running TUI: %v\n", err)
+			os.Exit(1)
+		}
+	},
+}
+
+func init() {
+	rootCmd.AddCommand(tuiCmd)
+}
