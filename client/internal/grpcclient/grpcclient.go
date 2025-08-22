@@ -10,13 +10,13 @@ import (
 	"google.golang.org/grpc/credentials"
 )
 
-// grpcclient holds the file, database and URL mapping information
+// Client holds the gRPC client connection and configuration
 type Client struct {
-	cfg    config.Config
-	ClientConn proto.VaultServiceClient
+	cfg        config.Config            // Application configuration
+	ClientConn proto.VaultServiceClient // gRPC client connection
 }
 
-// New creates a new grpcclient instance with file and database connections
+// New creates a new gRPC client instance with TLS connection
 func New(ctx context.Context, cfg config.Config) (*Client, error) {
 	creds, err := credentials.NewClientTLSFromFile("server.crt", "")
 	if err != nil {
@@ -34,7 +34,7 @@ func New(ctx context.Context, cfg config.Config) (*Client, error) {
 	grpcClient := proto.NewVaultServiceClient(conn)
 
 	clientInstance := Client{
-		cfg:    cfg,
+		cfg:        cfg,
 		ClientConn: grpcClient,
 	}
 

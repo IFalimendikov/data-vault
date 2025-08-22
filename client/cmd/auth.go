@@ -6,6 +6,7 @@ import (
 	"os"
 	"syscall"
 
+	"data-vault/client/internal/auth"
 	"data-vault/client/internal/models"
 
 	"github.com/spf13/cobra"
@@ -13,8 +14,8 @@ import (
 )
 
 var (
-	username string
-	password string
+	username string // Username for authentication commands
+	password string // Password for authentication commands
 )
 
 // registerCmd represents the register command
@@ -57,9 +58,14 @@ var registerCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
+		// Save JWT for future use
+		if err := auth.SaveJWT(jwt, username); err != nil {
+			fmt.Fprintf(os.Stderr, "Warning: Could not save JWT token: %v\n", err)
+		}
+
 		fmt.Printf("Registration successful!\n")
 		fmt.Printf("JWT Token: %s\n", jwt)
-		fmt.Println("Save this token for future operations.")
+		fmt.Println("Token saved for future operations.")
 	},
 }
 
@@ -103,15 +109,36 @@ var loginCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
+		// Save JWT for future use
+		if err := auth.SaveJWT(jwt, username); err != nil {
+			fmt.Fprintf(os.Stderr, "Warning: Could not save JWT token: %v\n", err)
+		}
+
 		fmt.Printf("Login successful!\n")
 		fmt.Printf("JWT Token: %s\n", jwt)
-		fmt.Println("Save this token for future operations.")
+		fmt.Println("Token saved for future operations.")
 	},
 }
 
+// logoutCmd represents the logout command
+var logoutCmd = &cobra.Command{
+	Use:   "logout",
+	Short: "Logout and clear saved credentials",
+	Long:  "Remove saved JWT token and logout from the Data Vault client.",
+	Run: func(cmd *cobra.Command, args []string) {
+		if err := auth.ClearJWT(); err != nil {
+			fmt.Fprintf(os.Stderr, "Error clearing credentials: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Println("Logged out successfully. Credentials cleared.")
+	},
+}
+
+// init registers authentication commands with the root command
 func init() {
 	rootCmd.AddCommand(registerCmd)
 	rootCmd.AddCommand(loginCmd)
+	rootCmd.AddCommand(logoutCmd)
 
 	// Add flags for both commands
 	registerCmd.Flags().StringVarP(&username, "username", "u", "", "Username for registration")

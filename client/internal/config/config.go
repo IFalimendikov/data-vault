@@ -6,11 +6,13 @@ import (
 	env "github.com/joho/godotenv"
 )
 
+// Config holds application configuration settings
 type Config struct {
 	RunAddr    string `env:"RUN_ADDRESS" envDefault:"localhost:8080"`
-	ServerAddr   string `env:"SERVER_ADDRESS"`
+	ServerAddr string `env:"SERVER_ADDRESS"`
 }
 
+// New creates and loads a new configuration instance
 func New() (Config, error) {
 	cfg := Config{}
 

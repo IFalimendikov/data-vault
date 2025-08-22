@@ -4,10 +4,11 @@ import (
 	"context"
 
 	"data-vault/client/internal/proto"
+
 	"google.golang.org/grpc/metadata"
 )
 
-// Delete marks multiple URLs as deleted in the database for a given user
+// DeleteData removes a specific data entry from the vault via gRPC
 func (c *Client) DeleteData(ctx context.Context, jwt, id string) error {
 	md := metadata.New(map[string]string{
 		"authorization": "Bearer " + jwt,

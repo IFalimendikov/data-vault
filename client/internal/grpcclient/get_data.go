@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-// Get retrieves the original URL using the shortened URL
+// GetData retrieves all user data from the vault via gRPC
 func (c *Client) GetData(ctx context.Context, jwt string) ([]models.Data, error) {
 	var resp []models.Data
 
@@ -26,9 +26,9 @@ func (c *Client) GetData(ctx context.Context, jwt string) ([]models.Data, error)
 
 	for _, d := range grpcResp.Data {
 		resp = append(resp, models.Data{
-			ID:   d.Id,
-			Data: d.Data,
-			Status: d.Status,
+			ID:         d.Id,
+			Data:       d.Data,
+			Status:     d.Status,
 			UploadedAt: d.UploadedAt,
 		})
 	}

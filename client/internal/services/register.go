@@ -5,7 +5,7 @@ import (
 	"data-vault/client/internal/models"
 )
 
-// DeleteURLs processes a batch of URLs for deletion for a specific user
+// Register creates a new user account and returns a JWT token
 func (v *Vault) Register(ctx context.Context, user models.User) (string, error) {
 	jwt, err := v.grpcclient.Register(ctx, user)
 	if err != nil {

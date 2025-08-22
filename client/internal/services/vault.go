@@ -7,7 +7,7 @@ import (
 	"log/slog"
 )
 
-// Service defines the interface for URL shortening operations
+// Service defines the interface for vault operations
 type Service interface {
 	Register(ctx context.Context, user models.User) (string, error)
 	Login(ctx context.Context, user models.User) (string, error)
@@ -17,14 +17,14 @@ type Service interface {
 	PingServer(ctx context.Context) bool
 }
 
-// URLs implements the Service interface and manages URL shortening operations
+// Vault implements the Service interface and manages vault operations
 type Vault struct {
-	ctx        context.Context
+	ctx        context.Context    // Request context
 	Log        *slog.Logger       // Logger for service operations
-	grpcclient *grpcclient.Client // grpcclient interface for persistence
+	grpcclient *grpcclient.Client // gRPC client interface for server communication
 }
 
-// New creates and initializes a new URLs service instance
+// New creates and initializes a new Vault service instance
 func New(ctx context.Context, log *slog.Logger, grpcclient *grpcclient.Client) *Vault {
 	service := Vault{
 		ctx:        ctx,

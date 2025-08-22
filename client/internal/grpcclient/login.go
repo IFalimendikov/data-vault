@@ -6,6 +6,7 @@ import (
 	"data-vault/client/internal/proto"
 )
 
+// Login authenticates a user via gRPC and returns a JWT token
 func (c *Client) Login(ctx context.Context, user models.User) (string, error) {
 	req := &proto.LoginRequest{
 		User: &proto.User{

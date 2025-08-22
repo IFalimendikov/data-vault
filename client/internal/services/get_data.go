@@ -5,7 +5,7 @@ import (
 	"data-vault/client/internal/models"
 )
 
-// GetURL retrieves the original URL from grpcclient using the shortened URL as a key
+// GetData retrieves all user data from the vault
 func (v *Vault) GetData(ctx context.Context, jwt string) ([]models.Data, error) {
 	var res []models.Data
 

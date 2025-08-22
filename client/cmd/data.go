@@ -5,13 +5,15 @@ import (
 	"fmt"
 	"os"
 
+	"data-vault/client/internal/auth"
+
 	"github.com/spf13/cobra"
 )
 
 var (
-	jwtToken string
-	dataText string
-	dataID   string
+	jwtToken string // JWT token for authentication
+	dataText string // Text data to be stored
+	dataID   string // Data ID for operations
 )
 
 // dataCmd represents the data command group
@@ -27,8 +29,18 @@ var postCmd = &cobra.Command{
 	Short: "Store data in the vault",
 	Long:  "Store encrypted data in the Data Vault server.",
 	Run: func(cmd *cobra.Command, args []string) {
+		// Auto-load JWT if not provided
 		if jwtToken == "" {
-			fmt.Fprintf(os.Stderr, "Error: JWT token is required (use --jwt flag)\n")
+			savedJWT, err := auth.LoadJWT()
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error loading saved credentials: %v\n", err)
+				os.Exit(1)
+			}
+			jwtToken = savedJWT
+		}
+
+		if jwtToken == "" {
+			fmt.Fprintf(os.Stderr, "Error: Not authenticated. Please login first with 'data-vault-client login'\n")
 			os.Exit(1)
 		}
 
@@ -64,8 +76,18 @@ var getCmd = &cobra.Command{
 	Short: "Retrieve data from the vault",
 	Long:  "Retrieve all your stored data from the Data Vault server.",
 	Run: func(cmd *cobra.Command, args []string) {
+		// Auto-load JWT if not provided
 		if jwtToken == "" {
-			fmt.Fprintf(os.Stderr, "Error: JWT token is required (use --jwt flag)\n")
+			savedJWT, err := auth.LoadJWT()
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error loading saved credentials: %v\n", err)
+				os.Exit(1)
+			}
+			jwtToken = savedJWT
+		}
+
+		if jwtToken == "" {
+			fmt.Fprintf(os.Stderr, "Error: Not authenticated. Please login first with 'data-vault-client login'\n")
 			os.Exit(1)
 		}
 
@@ -100,8 +122,18 @@ var deleteCmd = &cobra.Command{
 	Short: "Delete data from the vault",
 	Long:  "Delete a specific data entry from the Data Vault server by ID.",
 	Run: func(cmd *cobra.Command, args []string) {
+		// Auto-load JWT if not provided
 		if jwtToken == "" {
-			fmt.Fprintf(os.Stderr, "Error: JWT token is required (use --jwt flag)\n")
+			savedJWT, err := auth.LoadJWT()
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error loading saved credentials: %v\n", err)
+				os.Exit(1)
+			}
+			jwtToken = savedJWT
+		}
+
+		if jwtToken == "" {
+			fmt.Fprintf(os.Stderr, "Error: Not authenticated. Please login first with 'data-vault-client login'\n")
 			os.Exit(1)
 		}
 
@@ -131,16 +163,15 @@ var deleteCmd = &cobra.Command{
 	},
 }
 
+// init registers data commands and sets up their flags
 func init() {
 	rootCmd.AddCommand(dataCmd)
 	dataCmd.AddCommand(postCmd)
 	dataCmd.AddCommand(getCmd)
 	dataCmd.AddCommand(deleteCmd)
 
-	// Persistent flags for all data commands
 	dataCmd.PersistentFlags().StringVar(&jwtToken, "jwt", "", "JWT token for authentication")
 
-	// Specific flags
 	postCmd.Flags().StringVarP(&dataText, "data", "d", "", "Data to store")
 	deleteCmd.Flags().StringVar(&dataID, "id", "", "ID of data to delete")
 }

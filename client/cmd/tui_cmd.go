@@ -12,7 +12,7 @@ import (
 var tuiCmd = &cobra.Command{
 	Use:   "tui",
 	Short: "Launch interactive TUI mode",
-	Long:  "Launch the interactive Text User Interface for a more user-friendly experience.",
+	Long:  "Launch the interactive Text User Interface.",
 	Run: func(cmd *cobra.Command, args []string) {
 		p := tea.NewProgram(initialModel(), tea.WithAltScreen())
 		if _, err := p.Run(); err != nil {

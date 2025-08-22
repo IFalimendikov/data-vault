@@ -17,7 +17,6 @@ retrieving, and managing encrypted data via gRPC connection to Data Vault server
 The client provides user authentication, data operations, and server connectivity
 across Windows, Linux, and macOS platforms.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// If no subcommand is provided, launch TUI
 		tuiCmd.Run(cmd, args)
 	},
 }
@@ -31,6 +30,5 @@ func Execute() {
 }
 
 func init() {
-	// Global flags can be added here
 	rootCmd.PersistentFlags().StringP("config", "c", "", "config file path")
 }

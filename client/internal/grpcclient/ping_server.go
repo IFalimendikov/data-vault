@@ -5,6 +5,7 @@ import (
 	"data-vault/client/internal/proto"
 )
 
+// PingServer checks server connectivity via gRPC
 func (c *Client) PingServer(ctx context.Context) bool {
 	req := &proto.PingServerRequest{}
 

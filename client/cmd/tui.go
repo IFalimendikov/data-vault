@@ -11,36 +11,39 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+// sessionState represents different states in the TUI application
 type sessionState int
 
 const (
-	mainMenuView sessionState = iota
-	loginView
-	registerView
-	dataMenuView
-	postDataView
-	getDataView
-	deleteDataView
-	pingView
+	mainMenuView   sessionState = iota // Main menu screen
+	loginView                          // Login form screen
+	registerView                       // Registration form screen
+	dataMenuView                       // Data operations menu
+	postDataView                       // Post data form screen
+	getDataView                        // Get data display screen
+	deleteDataView                     // Delete data form screen
+	pingView                           // Server ping screen
 )
 
+// model represents the TUI application state and data
 type model struct {
-	state      sessionState
-	choices    []string
-	cursor     int
-	selected   map[int]struct{}
-	username   string
-	password   string
-	data       string
-	dataID     string
-	jwtToken   string
-	message    string
-	inputMode  bool
-	inputField string
-	userData   []models.Data
-	err        error
+	state      sessionState     // Current application state
+	choices    []string         // Menu choices for current state
+	cursor     int              // Current cursor position
+	selected   map[int]struct{} // Selected items tracker
+	username   string           // Current username
+	password   string           // Current password
+	data       string           // Data input field
+	dataID     string           // Data ID input field
+	jwtToken   string           // JWT authentication token
+	message    string           // Display message for user
+	inputMode  bool             // Whether in input mode
+	inputField string           // Current input field name
+	userData   []models.Data    // User's data from server
+	err        error            // Last error encountered
 }
 
+// initialModel creates and returns the initial TUI model
 func initialModel() model {
 	return model{
 		state:     mainMenuView,
@@ -353,33 +356,39 @@ func (m model) resetInput() {
 }
 
 // Command methods
+// loginMsg represents the result of a login operation
 type loginMsg struct {
 	success bool
 	token   string
 	err     error
 }
 
+// registerMsg represents the result of a registration operation
 type registerMsg struct {
 	success bool
 	token   string
 	err     error
 }
 
+// postDataMsg represents the result of a post data operation
 type postDataMsg struct {
 	success bool
 	err     error
 }
 
+// getDataMsg represents the result of a get data operation
 type getDataMsg struct {
 	data []models.Data
 	err  error
 }
 
+// deleteDataMsg represents the result of a delete data operation
 type deleteDataMsg struct {
 	success bool
 	err     error
 }
 
+// pingMsg represents the result of a server ping operation
 type pingMsg struct {
 	success bool
 	err     error
