@@ -28,14 +28,14 @@ const (
 	userIDKey      contextKey = "user_id"
 )
 
-// Transport handles gRPC transport layer operations including middleware and routing
+// Transport handles gRPC transport layer operations
 type Transport struct {
 	handler *handler.Handler
 	cfg     config.Config
 	log     *slog.Logger
 }
 
-// New creates a new Transport instance with the provided configuration and handlers
+// New creates a new Transport instance
 func New(h *handler.Handler, cfg config.Config, log *slog.Logger) *Transport {
 	return &Transport{
 		handler: h,
@@ -44,10 +44,10 @@ func New(h *handler.Handler, cfg config.Config, log *slog.Logger) *Transport {
 	}
 }
 
-// Claims represents JWT claims structure
+// Claim represents JWT claims structure
 type Claim struct {
 	jwt.RegisteredClaims
-	Login    string
+	Login string
 }
 
 // NewRouter creates and returns a new configured gRPC server with interceptors
@@ -70,7 +70,7 @@ func NewRouter(g *Transport) (*grpc.Server, error) {
 	return server, nil
 }
 
-// LoggingInterceptor adds request logging that records method, duration, and status
+// LoggingInterceptor adds request logging for all gRPC calls
 func LoggingInterceptor(log *slog.Logger) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		start := time.Now()

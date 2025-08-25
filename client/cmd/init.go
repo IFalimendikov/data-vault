@@ -11,23 +11,19 @@ import (
 
 // initService initializes the service layer with gRPC client
 func initService() (*services.Vault, error) {
-	// Load configuration
 	cfg, err := config.New()
 	if err != nil {
 		return nil, err
 	}
 
-	// Initialize logger
 	log := logger.New()
 	ctx := context.Background()
 
-	// Create gRPC client connection
 	client, err := grpcclient.New(ctx, cfg)
 	if err != nil {
 		return nil, err
 	}
 
-	// Initialize service layer
 	service := services.New(ctx, log, client)
 	return service, nil
 }

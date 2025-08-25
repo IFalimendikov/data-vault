@@ -13,12 +13,13 @@ import (
 	"golang.org/x/term"
 )
 
+// Authentication command variables
 var (
-	username string // Username for authentication commands
-	password string // Password for authentication commands
+	username string
+	password string
 )
 
-// registerCmd represents the register command
+// registerCmd handles user registration
 var registerCmd = &cobra.Command{
 	Use:   "register",
 	Short: "Register a new user",
@@ -37,7 +38,7 @@ var registerCmd = &cobra.Command{
 				os.Exit(1)
 			}
 			password = string(passwordBytes)
-			fmt.Println() // Add newline after password input
+			fmt.Println()
 		}
 
 		if username == "" || password == "" {
@@ -58,7 +59,6 @@ var registerCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		// Save JWT for future use
 		if err := auth.SaveJWT(jwt, username); err != nil {
 			fmt.Fprintf(os.Stderr, "Warning: Could not save JWT token: %v\n", err)
 		}
@@ -69,7 +69,7 @@ var registerCmd = &cobra.Command{
 	},
 }
 
-// loginCmd represents the login command
+// loginCmd handles user authentication
 var loginCmd = &cobra.Command{
 	Use:   "login",
 	Short: "Login with existing credentials",
@@ -88,7 +88,7 @@ var loginCmd = &cobra.Command{
 				os.Exit(1)
 			}
 			password = string(passwordBytes)
-			fmt.Println() // Add newline after password input
+			fmt.Println()
 		}
 
 		if username == "" || password == "" {
@@ -109,7 +109,6 @@ var loginCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		// Save JWT for future use
 		if err := auth.SaveJWT(jwt, username); err != nil {
 			fmt.Fprintf(os.Stderr, "Warning: Could not save JWT token: %v\n", err)
 		}
@@ -120,7 +119,7 @@ var loginCmd = &cobra.Command{
 	},
 }
 
-// logoutCmd represents the logout command
+// logoutCmd handles user logout and credential clearing
 var logoutCmd = &cobra.Command{
 	Use:   "logout",
 	Short: "Logout and clear saved credentials",
@@ -134,13 +133,12 @@ var logoutCmd = &cobra.Command{
 	},
 }
 
-// init registers authentication commands with the root command
+// init registers authentication commands and their flags
 func init() {
 	rootCmd.AddCommand(registerCmd)
 	rootCmd.AddCommand(loginCmd)
 	rootCmd.AddCommand(logoutCmd)
 
-	// Add flags for both commands
 	registerCmd.Flags().StringVarP(&username, "username", "u", "", "Username for registration")
 	registerCmd.Flags().StringVarP(&password, "password", "p", "", "Password for registration")
 

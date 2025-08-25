@@ -18,10 +18,7 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-// @title          	Data Vault Server
-// @version         1.0
-// @description     Data Vault Server
-
+// main is the entry point for the Data Vault server application
 func main() {
 	log := logger.New()
 

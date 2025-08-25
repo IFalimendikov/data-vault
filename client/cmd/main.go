@@ -1,13 +1,13 @@
 package main
 
-// Build-time variables (populated via -ldflags in release builds)
+// Build-time variables for version information
 var (
-	buildVersion string = "N/A"
+	buildVersion string = "1.0.0"
 	buildDate    string = "N/A"
 	buildCommit  string = "N/A"
 )
 
-// main now delegates to Cobra root command which launches the TUI by default.
+// main is the entry point that executes the root command
 func main() {
 	Execute()
 }

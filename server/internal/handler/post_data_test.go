@@ -16,18 +16,20 @@ import (
 
 func TestPostData(t *testing.T) {
 	tests := []struct {
-		name         string
-		data         string
-		userID       interface{}
-		mockError    error
-		expectError  bool
-		expectedCode codes.Code
-		expectedMsg  string
+		name          string
+		data          []byte
+		dataType      string
+		userID        interface{}
+		mockError     error
+		expectError   bool
+		expectedCode  codes.Code
+		expectedMsg   string
 		expectSuccess bool
 	}{
 		{
 			name:          "success",
-			data:          "sensitive data to store",
+			data:          []byte("sensitive data to store"),
+			dataType:      "text",
 			userID:        "testuser",
 			mockError:     nil,
 			expectError:   false,
@@ -35,7 +37,17 @@ func TestPostData(t *testing.T) {
 		},
 		{
 			name:         "empty data",
-			data:         "",
+			data:         []byte{},
+			dataType:     "text",
+			userID:       "testuser",
+			expectError:  true,
+			expectedCode: codes.InvalidArgument,
+			expectedMsg:  "Data not provided",
+		},
+		{
+			name:         "empty data type",
+			data:         []byte("sensitive data to store"),
+			dataType:     "",
 			userID:       "testuser",
 			expectError:  true,
 			expectedCode: codes.InvalidArgument,
@@ -43,7 +55,8 @@ func TestPostData(t *testing.T) {
 		},
 		{
 			name:         "missing user ID in context",
-			data:         "sensitive data to store",
+			data:         []byte("sensitive data to store"),
+			dataType:     "text",
 			userID:       nil,
 			expectError:  true,
 			expectedCode: codes.Unauthenticated,
@@ -51,7 +64,8 @@ func TestPostData(t *testing.T) {
 		},
 		{
 			name:         "empty user ID in context",
-			data:         "sensitive data to store",
+			data:         []byte("sensitive data to store"),
+			dataType:     "text",
 			userID:       "",
 			expectError:  true,
 			expectedCode: codes.Unauthenticated,
@@ -59,7 +73,8 @@ func TestPostData(t *testing.T) {
 		},
 		{
 			name:         "wrong user ID type",
-			data:         "sensitive data to store",
+			data:         []byte("sensitive data to store"),
+			dataType:     "text",
 			userID:       123,
 			expectError:  true,
 			expectedCode: codes.Unauthenticated,
@@ -67,7 +82,8 @@ func TestPostData(t *testing.T) {
 		},
 		{
 			name:         "service error",
-			data:         "sensitive data to store",
+			data:         []byte("sensitive data to store"),
+			dataType:     "text",
 			userID:       "testuser",
 			mockError:    errors.New("storage error"),
 			expectError:  true,
@@ -76,7 +92,8 @@ func TestPostData(t *testing.T) {
 		},
 		{
 			name:          "large data",
-			data:          string(make([]byte, 10000)),
+			data:          make([]byte, 10000),
+			dataType:      "binary",
 			userID:        "testuser",
 			mockError:     nil,
 			expectError:   false,
@@ -89,6 +106,7 @@ func TestPostData(t *testing.T) {
 			handler, mockService := setupTestHandler()
 
 			request := &proto.PostDataRequest{
+				Type: tt.dataType,
 				Data: tt.data,
 			}
 
@@ -100,8 +118,8 @@ func TestPostData(t *testing.T) {
 			}
 
 			// Only set up mock for valid requests
-			if tt.data != "" && tt.userID == "testuser" {
-				mockService.On("PostData", mock.Anything, "testuser", tt.data).Return(tt.mockError)
+			if len(tt.data) > 0 && tt.dataType != "" && tt.userID == "testuser" {
+				mockService.On("PostData", mock.Anything, "testuser", tt.dataType, tt.data).Return(tt.mockError)
 			}
 
 			response, err := handler.PostData(ctx, request)

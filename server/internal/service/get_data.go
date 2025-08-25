@@ -5,6 +5,7 @@ import (
 	"data-vault/server/internal/models"
 )
 
+// GetData retrieves and decrypts all data for a specific user
 func (s *Vault) GetData(ctx context.Context, login string) ([]models.Data, error) {
 	var res []models.Data
 
@@ -18,15 +19,17 @@ func (s *Vault) GetData(ctx context.Context, login string) ([]models.Data, error
 	}
 
 	for _, d := range data {
-		decryptedData, err := s.decrypt(ctx, d.Data)
+		decryptedData, err := s.decryptBytes(ctx, d.Data)
 		if err != nil {
 			return nil, err
 		}
 		res = append(res, models.Data{
 			ID:         d.ID,
+			User:       d.User,
+			Status:     d.Status,
+			Type:       d.Type,
 			Data:       decryptedData,
 			UploadedAt: d.UploadedAt,
-			Status:     d.Status,
 		})
 	}
 	return res, nil

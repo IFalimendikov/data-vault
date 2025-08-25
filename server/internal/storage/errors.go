@@ -4,14 +4,11 @@ import (
 	"errors"
 )
 
+// Package level errors for the storage layer
 var (
-	ErrBadConn = errors.New("error connecting to DB")
+	ErrBadConn        = errors.New("error connecting to DB")
 	ErrDuplicateLogin = errors.New("login already taken")
-	ErrDuplicateNumber = errors.New("order uploaded by different user")
-	ErrDuplicateOrder = errors.New("order already received")
-	ErrWrongPassword = errors.New("login/password pair is wrong")
-	ErrUnauthorized = errors.New("user not logged in")
-	ErrNoOrdersFound = errors.New("client has no orders")
-	ErrNoWithdrawalsFound = errors.New("client has no withdrawals")
-	ErrBalanceTooLow = errors.New("balance is too low for the transcation")
+	ErrWrongPassword  = errors.New("login/password pair is wrong")
+	ErrUnauthorized   = errors.New("user not logged in")
+	ErrNoDataFound    = errors.New("no data found for user")
 )

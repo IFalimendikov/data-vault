@@ -32,8 +32,8 @@ func (m *MockService) Login(ctx context.Context, user models.User) error {
 	return args.Error(0)
 }
 
-func (m *MockService) PostData(ctx context.Context, login, data string) error {
-	args := m.Called(ctx, login, data)
+func (m *MockService) PostData(ctx context.Context, login, dataType string, data []byte) error {
+	args := m.Called(ctx, login, dataType, data)
 	return args.Error(0)
 }
 
@@ -62,7 +62,7 @@ func setupTestHandler() (*Handler, *MockService) {
 		DatabaseURI:   "test-db-uri",
 	}
 	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
-	
+
 	handler := New(context.Background(), mockService, cfg, logger)
 	return handler, mockService
 }
@@ -71,7 +71,7 @@ func setupTestHandler() (*Handler, *MockService) {
 func setupTestHandlerWithConfig(cfg config.Config) (*Handler, *MockService) {
 	mockService := &MockService{}
 	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
-	
+
 	handler := New(context.Background(), mockService, cfg, logger)
 	return handler, mockService
 }
@@ -92,8 +92,9 @@ func createTestData(userLogin string, count int) []models.Data {
 			ID:         fmt.Sprintf("data%d", i+1),
 			User:       userLogin,
 			Status:     "active",
-			Data:       fmt.Sprintf("encrypted data %d", i+1),
-			UploadedAt: time.Now().Add(-time.Duration(i)*time.Hour).Format(time.RFC3339),
+			Type:       "text",
+			Data:       []byte(fmt.Sprintf("encrypted data %d", i+1)),
+			UploadedAt: time.Now().Add(-time.Duration(i) * time.Hour).Format(time.RFC3339),
 		}
 	}
 	return data

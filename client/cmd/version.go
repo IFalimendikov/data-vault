@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// versionCmd represents the version command
+// versionCmd displays version information
 var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Show version information",
@@ -19,6 +19,7 @@ var versionCmd = &cobra.Command{
 	},
 }
 
+// init registers the version command
 func init() {
 	rootCmd.AddCommand(versionCmd)
 }

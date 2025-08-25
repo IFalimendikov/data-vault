@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// tuiCmd represents the interactive TUI command
+// tuiCmd launches the interactive TUI mode
 var tuiCmd = &cobra.Command{
 	Use:   "tui",
 	Short: "Launch interactive TUI mode",
@@ -22,6 +22,7 @@ var tuiCmd = &cobra.Command{
 	},
 }
 
+// init registers the TUI command
 func init() {
 	rootCmd.AddCommand(tuiCmd)
 }

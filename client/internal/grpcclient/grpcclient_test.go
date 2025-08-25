@@ -300,7 +300,7 @@ func TestFullWorkflowWithJWTIntegration(t *testing.T) {
 
 	// Step 3: Use JWT to post data
 	testData := "This is test data for the full workflow"
-	err = client.PostData(ctx, jwt, testData)
+	err = client.PostData(ctx, jwt, "text", []byte(testData))
 	require.NoError(t, err, "PostData should succeed with valid JWT")
 
 	// Step 4: Use JWT to get data
@@ -340,25 +340,25 @@ func TestJWTSecurityValidation(t *testing.T) {
 	testData := "Sensitive test data"
 
 	// Test 1: Valid JWT should work
-	err = client.PostData(ctx, validJWT, testData)
+	err = client.PostData(ctx, validJWT, "text", []byte(testData))
 	assert.NoError(t, err, "Valid JWT should allow data posting")
 
 	// Test 2: Invalid JWT should be rejected
 	invalidJWT := "invalid.jwt.token"
-	err = client.PostData(ctx, invalidJWT, testData)
+	err = client.PostData(ctx, invalidJWT, "text", []byte(testData))
 	assert.Error(t, err, "Invalid JWT should be rejected")
 
 	// Test 3: Empty JWT should be rejected
-	err = client.PostData(ctx, "", testData)
+	err = client.PostData(ctx, "", "text", []byte(testData))
 	assert.Error(t, err, "Empty JWT should be rejected")
 
 	// Test 4: Malformed JWT should be rejected
 	malformedJWT := "header.payload" // Missing signature
-	err = client.PostData(ctx, malformedJWT, testData)
+	err = client.PostData(ctx, malformedJWT, "text", []byte(testData))
 	assert.Error(t, err, "Malformed JWT should be rejected")
 
 	// Test 5: JWT with wrong signature should be rejected
 	wrongSignatureJWT := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dpbiI6ImF0dGFja2VyIiwiZXhwIjo5OTk5OTk5OTk5LCJpYXQiOjE2MDAwMDAwMDB9.wrong_signature"
-	err = client.PostData(ctx, wrongSignatureJWT, testData)
+	err = client.PostData(ctx, wrongSignatureJWT, "text", []byte(testData))
 	assert.Error(t, err, "JWT with wrong signature should be rejected")
 }

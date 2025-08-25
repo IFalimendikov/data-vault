@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// rootCmd represents the base command when called without any subcommands
+// rootCmd is the base command for the CLI application
 var rootCmd = &cobra.Command{
 	Use:   "data-vault-client",
 	Short: "A secure CLI client for Data Vault server",
@@ -21,7 +21,7 @@ across Windows, Linux, and macOS platforms.`,
 	},
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
+// Execute runs the root command and handles errors
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
@@ -29,6 +29,7 @@ func Execute() {
 	}
 }
 
+// init configures the root command flags
 func init() {
 	rootCmd.PersistentFlags().StringP("config", "c", "", "config file path")
 }

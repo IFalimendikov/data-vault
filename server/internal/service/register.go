@@ -2,10 +2,11 @@ package service
 
 import (
 	"context"
-	"database/sql"
 	"data-vault/server/internal/models"
+	"database/sql"
 )
 
+// Register creates a new user account with encrypted password
 func (s *Vault) Register(ctx context.Context, user models.User) error {
 	tx, err := s.Storage.DB.BeginTx(ctx, &sql.TxOptions{
 		Isolation: sql.LevelSerializable,

@@ -11,36 +11,37 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-// sessionState represents different states in the TUI application
+// sessionState represents the current state of the TUI application
 type sessionState int
 
 const (
-	mainMenuView   sessionState = iota // Main menu screen
-	loginView                          // Login form screen
-	registerView                       // Registration form screen
-	dataMenuView                       // Data operations menu
-	postDataView                       // Post data form screen
-	getDataView                        // Get data display screen
-	deleteDataView                     // Delete data form screen
-	pingView                           // Server ping screen
+	mainMenuView sessionState = iota
+	loginView
+	registerView
+	dataMenuView
+	postDataView
+	getDataView
+	deleteDataView
+	pingView
 )
 
-// model represents the TUI application state and data
+// model represents the complete TUI application state
 type model struct {
-	state      sessionState     // Current application state
-	choices    []string         // Menu choices for current state
-	cursor     int              // Current cursor position
-	selected   map[int]struct{} // Selected items tracker
-	username   string           // Current username
-	password   string           // Current password
-	data       string           // Data input field
-	dataID     string           // Data ID input field
-	jwtToken   string           // JWT authentication token
-	message    string           // Display message for user
-	inputMode  bool             // Whether in input mode
-	inputField string           // Current input field name
-	userData   []models.Data    // User's data from server
-	err        error            // Last error encountered
+	state      sessionState
+	choices    []string
+	cursor     int
+	selected   map[int]struct{}
+	username   string
+	password   string
+	data       string
+	dataType   string
+	dataID     string
+	jwtToken   string
+	message    string
+	inputMode  bool
+	inputField string
+	userData   []models.Data
+	err        error
 }
 
 // initialModel creates and returns the initial TUI model
@@ -53,10 +54,12 @@ func initialModel() model {
 	}
 }
 
+// Init initializes the TUI application
 func (m model) Init() tea.Cmd {
 	return nil
 }
 
+// Update handles all state updates for the TUI
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -137,6 +140,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
+// updateMainMenu handles main menu navigation
 func (m model) updateMainMenu(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	switch msg.String() {
 	case "ctrl+c", "q":
@@ -151,26 +155,27 @@ func (m model) updateMainMenu(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 	case "enter", " ":
 		switch m.cursor {
-		case 0: // Login
+		case 0:
 			m.state = loginView
 			m.inputMode = true
 			m.inputField = "username"
 			m.message = ""
-		case 1: // Register
+		case 1:
 			m.state = registerView
 			m.inputMode = true
 			m.inputField = "username"
 			m.message = ""
-		case 2: // Ping
+		case 2:
 			m.state = pingView
 			return m, m.pingServerCmd()
-		case 3: // Quit
+		case 3:
 			return m, tea.Quit
 		}
 	}
 	return m, nil
 }
 
+// updateLogin handles login form input
 func (m model) updateLogin(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	switch msg.String() {
 	case "ctrl+c":
@@ -203,6 +208,7 @@ func (m model) updateLogin(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
+// updateRegister handles registration form input
 func (m model) updateRegister(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	switch msg.String() {
 	case "ctrl+c":
@@ -235,6 +241,7 @@ func (m model) updateRegister(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
+// updateDataMenu handles data operations menu navigation
 func (m model) updateDataMenu(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	dataChoices := []string{"Post Data", "Get Data", "Delete Data", "Back to Main Menu"}
 
@@ -254,20 +261,20 @@ func (m model) updateDataMenu(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 	case "enter", " ":
 		switch m.cursor {
-		case 0: // Post Data
+		case 0:
 			m.state = postDataView
 			m.inputMode = true
 			m.inputField = "data"
 			m.message = ""
-		case 1: // Get Data
+		case 1:
 			m.state = getDataView
 			return m, m.getDataCmd()
-		case 2: // Delete Data
+		case 2:
 			m.state = deleteDataView
 			m.inputMode = true
 			m.inputField = "dataID"
 			m.message = ""
-		case 3: // Back
+		case 3:
 			m.state = mainMenuView
 			m.cursor = 0
 		}
@@ -275,6 +282,7 @@ func (m model) updateDataMenu(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
+// updatePostData handles post data form input
 func (m model) updatePostData(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	switch msg.String() {
 	case "ctrl+c":
@@ -299,6 +307,7 @@ func (m model) updatePostData(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
+// updateGetData handles get data view navigation
 func (m model) updateGetData(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	switch msg.String() {
 	case "ctrl+c":
@@ -310,6 +319,7 @@ func (m model) updateGetData(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
+// updateDeleteData handles delete data form input
 func (m model) updateDeleteData(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	switch msg.String() {
 	case "ctrl+c":
@@ -334,6 +344,7 @@ func (m model) updateDeleteData(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
+// updatePing handles ping view navigation
 func (m model) updatePing(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	switch msg.String() {
 	case "ctrl+c":
@@ -345,17 +356,18 @@ func (m model) updatePing(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
+// resetInput clears all input fields and resets input state
 func (m model) resetInput() {
 	m.username = ""
 	m.password = ""
 	m.data = ""
+	m.dataType = ""
 	m.dataID = ""
 	m.inputMode = false
 	m.inputField = ""
 	m.message = ""
 }
 
-// Command methods
 // loginMsg represents the result of a login operation
 type loginMsg struct {
 	success bool
@@ -394,6 +406,7 @@ type pingMsg struct {
 	err     error
 }
 
+// loginCmd creates a command to perform user login
 func (m model) loginCmd() tea.Cmd {
 	return func() tea.Msg {
 		service, err := initService()
@@ -411,6 +424,7 @@ func (m model) loginCmd() tea.Cmd {
 	}
 }
 
+// registerCmd creates a command to register a new user
 func (m model) registerCmd() tea.Cmd {
 	return func() tea.Msg {
 		service, err := initService()
@@ -428,6 +442,7 @@ func (m model) registerCmd() tea.Cmd {
 	}
 }
 
+// postDataCmd creates a command to post data to the server
 func (m model) postDataCmd() tea.Cmd {
 	return func() tea.Msg {
 		service, err := initService()
@@ -435,7 +450,12 @@ func (m model) postDataCmd() tea.Cmd {
 			return postDataMsg{success: false, err: err}
 		}
 
-		err = service.PostData(context.Background(), m.jwtToken, m.data)
+		dataType := m.dataType
+		if dataType == "" {
+			dataType = "text"
+		}
+
+		err = service.PostData(context.Background(), m.jwtToken, dataType, []byte(m.data))
 		if err != nil {
 			return postDataMsg{success: false, err: err}
 		}
@@ -444,6 +464,7 @@ func (m model) postDataCmd() tea.Cmd {
 	}
 }
 
+// getDataCmd creates a command to retrieve data from the server
 func (m model) getDataCmd() tea.Cmd {
 	return func() tea.Msg {
 		service, err := initService()
@@ -460,6 +481,7 @@ func (m model) getDataCmd() tea.Cmd {
 	}
 }
 
+// deleteDataCmd creates a command to delete data from the server
 func (m model) deleteDataCmd() tea.Cmd {
 	return func() tea.Msg {
 		service, err := initService()
@@ -476,6 +498,7 @@ func (m model) deleteDataCmd() tea.Cmd {
 	}
 }
 
+// pingServerCmd creates a command to ping the server
 func (m model) pingServerCmd() tea.Cmd {
 	return func() tea.Msg {
 		service, err := initService()
@@ -488,7 +511,7 @@ func (m model) pingServerCmd() tea.Cmd {
 	}
 }
 
-// Styling
+// TUI styling variables
 var (
 	titleStyle = lipgloss.NewStyle().
 			Bold(true).
@@ -513,6 +536,7 @@ var (
 			Bold(true)
 )
 
+// View renders the current state of the TUI
 func (m model) View() string {
 	var s strings.Builder
 
@@ -598,7 +622,8 @@ func (m model) View() string {
 		} else {
 			for i, item := range m.userData {
 				s.WriteString(fmt.Sprintf("%d. ID: %s\n", i+1, item.ID))
-				s.WriteString(fmt.Sprintf("   Data: %s\n", item.Data))
+				s.WriteString(fmt.Sprintf("   Type: %s\n", item.Type))
+				s.WriteString(fmt.Sprintf("   Data: %s\n", string(item.Data)))
 				s.WriteString(fmt.Sprintf("   Uploaded: %s\n\n", item.UploadedAt))
 			}
 		}

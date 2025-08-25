@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v5.28.3
-// source: internal/proto/vault.proto
+// source: vault.proto
 
 package proto
 
@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	VaultService_Register_FullMethodName   = "/vault.VaultService/Register"
 	VaultService_Login_FullMethodName      = "/vault.VaultService/Login"
+	VaultService_PingDB_FullMethodName     = "/vault.VaultService/PingDB"
 	VaultService_PostData_FullMethodName   = "/vault.VaultService/PostData"
 	VaultService_GetData_FullMethodName    = "/vault.VaultService/GetData"
 	VaultService_DeleteData_FullMethodName = "/vault.VaultService/DeleteData"
@@ -35,6 +36,7 @@ type VaultServiceClient interface {
 	// User operations
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+	PingDB(ctx context.Context, in *PingDBRequest, opts ...grpc.CallOption) (*PingDBResponse, error)
 	// Data operations
 	PostData(ctx context.Context, in *PostDataRequest, opts ...grpc.CallOption) (*PostDataResponse, error)
 	GetData(ctx context.Context, in *GetDataRequest, opts ...grpc.CallOption) (*GetDataResponse, error)
@@ -63,6 +65,16 @@ func (c *vaultServiceClient) Login(ctx context.Context, in *LoginRequest, opts .
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(LoginResponse)
 	err := c.cc.Invoke(ctx, VaultService_Login_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vaultServiceClient) PingDB(ctx context.Context, in *PingDBRequest, opts ...grpc.CallOption) (*PingDBResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PingDBResponse)
+	err := c.cc.Invoke(ctx, VaultService_PingDB_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -108,6 +120,7 @@ type VaultServiceServer interface {
 	// User operations
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
+	PingDB(context.Context, *PingDBRequest) (*PingDBResponse, error)
 	// Data operations
 	PostData(context.Context, *PostDataRequest) (*PostDataResponse, error)
 	GetData(context.Context, *GetDataRequest) (*GetDataResponse, error)
@@ -127,6 +140,9 @@ func (UnimplementedVaultServiceServer) Register(context.Context, *RegisterReques
 }
 func (UnimplementedVaultServiceServer) Login(context.Context, *LoginRequest) (*LoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
+}
+func (UnimplementedVaultServiceServer) PingDB(context.Context, *PingDBRequest) (*PingDBResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PingDB not implemented")
 }
 func (UnimplementedVaultServiceServer) PostData(context.Context, *PostDataRequest) (*PostDataResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PostData not implemented")
@@ -190,6 +206,24 @@ func _VaultService_Login_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(VaultServiceServer).Login(ctx, req.(*LoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VaultService_PingDB_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PingDBRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VaultServiceServer).PingDB(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VaultService_PingDB_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VaultServiceServer).PingDB(ctx, req.(*PingDBRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -264,6 +298,10 @@ var VaultService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _VaultService_Login_Handler,
 		},
 		{
+			MethodName: "PingDB",
+			Handler:    _VaultService_PingDB_Handler,
+		},
+		{
 			MethodName: "PostData",
 			Handler:    _VaultService_PostData_Handler,
 		},
@@ -277,5 +315,5 @@ var VaultService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "internal/proto/vault.proto",
+	Metadata: "vault.proto",
 }

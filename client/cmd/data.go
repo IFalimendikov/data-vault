@@ -10,10 +10,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Data command variables
 var (
-	jwtToken string // JWT token for authentication
-	dataText string // Text data to be stored
-	dataID   string // Data ID for operations
+	jwtToken string
+	dataText string
+	dataType string
+	dataID   string
 )
 
 // dataCmd represents the data command group
@@ -23,13 +25,12 @@ var dataCmd = &cobra.Command{
 	Long:  "Perform data operations like storing, retrieving, and deleting data from the vault.",
 }
 
-// postCmd represents the data post command
+// postCmd handles storing data in the vault
 var postCmd = &cobra.Command{
 	Use:   "post",
 	Short: "Store data in the vault",
 	Long:  "Store encrypted data in the Data Vault server.",
 	Run: func(cmd *cobra.Command, args []string) {
-		// Auto-load JWT if not provided
 		if jwtToken == "" {
 			savedJWT, err := auth.LoadJWT()
 			if err != nil {
@@ -54,13 +55,17 @@ var postCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
+		if dataType == "" {
+			dataType = "text"
+		}
+
 		service, err := initService()
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error initializing service: %v\n", err)
 			os.Exit(1)
 		}
 
-		err = service.PostData(context.Background(), jwtToken, dataText)
+		err = service.PostData(context.Background(), jwtToken, dataType, []byte(dataText))
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Failed to post data: %v\n", err)
 			os.Exit(1)
@@ -70,13 +75,12 @@ var postCmd = &cobra.Command{
 	},
 }
 
-// getCmd represents the data get command
+// getCmd handles retrieving data from the vault
 var getCmd = &cobra.Command{
 	Use:   "get",
 	Short: "Retrieve data from the vault",
 	Long:  "Retrieve all your stored data from the Data Vault server.",
 	Run: func(cmd *cobra.Command, args []string) {
-		// Auto-load JWT if not provided
 		if jwtToken == "" {
 			savedJWT, err := auth.LoadJWT()
 			if err != nil {
@@ -110,19 +114,18 @@ var getCmd = &cobra.Command{
 
 		fmt.Println("Your stored data:")
 		for i, item := range data {
-			fmt.Printf("%d. ID: %s\n   Data: %s\n   Uploaded: %s\n\n",
-				i+1, item.ID, item.Data, item.UploadedAt)
+			fmt.Printf("%d. ID: %s\n   Type: %s\n   Data: %s\n   Uploaded: %s\n\n",
+				i+1, item.ID, item.Type, string(item.Data), item.UploadedAt)
 		}
 	},
 }
 
-// deleteCmd represents the data delete command
+// deleteCmd handles deleting data from the vault
 var deleteCmd = &cobra.Command{
 	Use:   "delete",
 	Short: "Delete data from the vault",
 	Long:  "Delete a specific data entry from the Data Vault server by ID.",
 	Run: func(cmd *cobra.Command, args []string) {
-		// Auto-load JWT if not provided
 		if jwtToken == "" {
 			savedJWT, err := auth.LoadJWT()
 			if err != nil {
@@ -173,5 +176,6 @@ func init() {
 	dataCmd.PersistentFlags().StringVar(&jwtToken, "jwt", "", "JWT token for authentication")
 
 	postCmd.Flags().StringVarP(&dataText, "data", "d", "", "Data to store")
+	postCmd.Flags().StringVarP(&dataType, "type", "t", "text", "Type of data (text, password, binary, card)")
 	deleteCmd.Flags().StringVar(&dataID, "id", "", "ID of data to delete")
 }

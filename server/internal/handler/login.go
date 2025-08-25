@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// Login handles user authentication requests
 func (g *Handler) Login(ctx context.Context, in *proto.LoginRequest) (*proto.LoginResponse, error) {
 	var response *proto.LoginResponse
 

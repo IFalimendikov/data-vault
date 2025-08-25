@@ -11,7 +11,7 @@ import (
 type Service interface {
 	Register(ctx context.Context, user models.User) (string, error)
 	Login(ctx context.Context, user models.User) (string, error)
-	PostData(ctx context.Context, jwt, data string) error
+	PostData(ctx context.Context, jwt, dataType string, data []byte) error
 	GetData(ctx context.Context, jwt string) ([]models.Data, error)
 	DeleteData(ctx context.Context, jwt, id string) error
 	PingServer(ctx context.Context) bool
@@ -19,9 +19,9 @@ type Service interface {
 
 // Vault implements the Service interface and manages vault operations
 type Vault struct {
-	ctx        context.Context    // Request context
-	Log        *slog.Logger       // Logger for service operations
-	grpcclient *grpcclient.Client // gRPC client interface for server communication
+	ctx        context.Context
+	Log        *slog.Logger
+	grpcclient *grpcclient.Client
 }
 
 // New creates and initializes a new Vault service instance

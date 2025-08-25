@@ -9,6 +9,7 @@ import (
 	"data-vault/server/internal/config"
 	"data-vault/server/internal/models"
 	"data-vault/server/internal/proto"
+
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -19,16 +20,16 @@ const (
 	userIDKey        contextKey = "user_id"
 )
 
-// Service defines the interface for URL shortening operations
+// Service defines the interface for vault operations
 type Service interface {
 	Register(ctx context.Context, user models.User) error
 	Login(ctx context.Context, user models.User) error
-	PostData(ctx context.Context, login, data string) error
+	PostData(ctx context.Context, login, dataType string, data []byte) error
 	GetData(ctx context.Context, shortURL string) ([]models.Data, error)
 	DeleteData(ctx context.Context, login, id string) error
 }
 
-// Handler manages GRPC request handling for URL shortening service
+// Handler manages GRPC request handling for vault service
 type Handler struct {
 	proto.UnimplementedVaultServiceServer
 	service Service
@@ -36,6 +37,7 @@ type Handler struct {
 	log     *slog.Logger
 }
 
+// Claim represents JWT token claims
 type Claim struct {
 	jwt.RegisteredClaims
 	Login string
@@ -50,6 +52,7 @@ func New(ctx context.Context, s Service, cfg config.Config, log *slog.Logger) *H
 	}
 }
 
+// IssueJWT generates a JWT token for a user
 func (g *Handler) IssueJWT(user models.User) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claim{
 		RegisteredClaims: jwt.RegisteredClaims{

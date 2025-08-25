@@ -2,33 +2,34 @@ package storage
 
 import (
 	"context"
+	"data-vault/server/internal/models"
 	"database/sql"
 	"errors"
-	"data-vault/server/internal/models"
 
-    sq "github.com/Masterminds/squirrel"
+	sq "github.com/Masterminds/squirrel"
 )
 
+// Login validates user credentials against the database
 func (s *Storage) Login(ctx context.Context, user models.User) error {
-    var login string
-    
-    row := sq.Select("login").
-        From("users").
-        Where(sq.Eq{
-            "login": user.Login,
-            "password": user.Password,
-        }).
-        RunWith(s.DB).
-        PlaceholderFormat(sq.Dollar).
-        QueryRowContext(ctx)
+	var login string
 
-    err := row.Scan(&login)
-    if err != nil {
-        if errors.Is(err, sql.ErrNoRows) {
-            return ErrWrongPassword
-        }
-        return err
-    }
+	row := sq.Select("login").
+		From("users").
+		Where(sq.Eq{
+			"login":    user.Login,
+			"password": user.Password,
+		}).
+		RunWith(s.DB).
+		PlaceholderFormat(sq.Dollar).
+		QueryRowContext(ctx)
 
-    return nil
+	err := row.Scan(&login)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return ErrWrongPassword
+		}
+		return err
+	}
+
+	return nil
 }

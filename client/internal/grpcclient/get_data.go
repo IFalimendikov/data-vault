@@ -2,9 +2,9 @@ package grpcclient
 
 import (
 	"context"
-	"errors"
 	"data-vault/client/internal/models"
 	"data-vault/client/internal/proto"
+	"errors"
 
 	"google.golang.org/grpc/metadata"
 )
@@ -32,8 +32,10 @@ func (c *Client) GetData(ctx context.Context, jwt string) ([]models.Data, error)
 	for _, d := range grpcResp.Data {
 		resp = append(resp, models.Data{
 			ID:         d.Id,
-			Data:       d.Data,
+			User:       d.User,
 			Status:     d.Status,
+			Type:       d.Type,
+			Data:       d.Data,
 			UploadedAt: d.UploadedAt,
 		})
 	}

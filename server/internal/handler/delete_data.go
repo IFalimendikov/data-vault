@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// DeleteData handles data deletion requests
 func (g *Handler) DeleteData(ctx context.Context, in *proto.DeleteDataRequest) (*proto.DeleteDataResponse, error) {
 	var response *proto.DeleteDataResponse
 	userID, ok := ctx.Value(userIDKey).(string)
@@ -31,4 +32,3 @@ func (g *Handler) DeleteData(ctx context.Context, in *proto.DeleteDataRequest) (
 
 	return response, nil
 }
- 

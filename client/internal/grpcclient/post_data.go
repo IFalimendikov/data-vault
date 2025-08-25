@@ -9,17 +9,18 @@ import (
 )
 
 // PostData stores encrypted data in the vault via gRPC
-func (c *Client) PostData(ctx context.Context, jwt, data string) error {
+func (c *Client) PostData(ctx context.Context, jwt, dataType string, data []byte) error {
 	md := metadata.New(map[string]string{
 		"authorization": "Bearer " + jwt,
 	})
 	ctx = metadata.NewOutgoingContext(ctx, md)
 
-	if data == "" || jwt == "" {
-		return errors.New("data or JWT token is empty")
+	if len(data) == 0 || jwt == "" || dataType == "" {
+		return errors.New("data, data type, or JWT token is empty")
 	}
 
 	req := &proto.PostDataRequest{
+		Type: dataType,
 		Data: data,
 	}
 

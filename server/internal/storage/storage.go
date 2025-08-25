@@ -2,20 +2,23 @@ package storage
 
 import (
 	"context"
-	"database/sql"
 	"data-vault/server/internal/config"
+	"database/sql"
 )
 
+// Storage handles database operations and configuration
 type Storage struct {
 	cfg *config.Config
 	DB  *sql.DB
 }
 
+// Database table creation queries
 var (
-	UsersQuery       = `CREATE TABLE IF NOT EXISTS users (login text PRIMARY KEY, password text);`
-	StorageQuery     = `CREATE TABLE IF NOT EXISTS storage (id SERIAL PRIMARY KEY, user text, status text, data text, uploaded_at text);`
+	UsersQuery   = `CREATE TABLE IF NOT EXISTS users (login text PRIMARY KEY, password text);`
+	StorageQuery = `CREATE TABLE IF NOT EXISTS storage (id SERIAL PRIMARY KEY, user text, status text, type text, data bytea, uploaded_at text);`
 )
 
+// New creates and initializes a new storage instance with database connection
 func New(ctx context.Context, cfg *config.Config) (*Storage, error) {
 	if cfg.DatabaseURI == "" {
 		return nil, ErrBadConn

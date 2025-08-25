@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// GetData handles data retrieval requests
 func (g *Handler) GetData(ctx context.Context, in *proto.GetDataRequest) (*proto.GetDataResponse, error) {
 	userID, ok := ctx.Value(userIDKey).(string)
 	if !ok || userID == "" {
@@ -26,8 +27,10 @@ func (g *Handler) GetData(ctx context.Context, in *proto.GetDataRequest) (*proto
 	for _, d := range data {
 		response.Data = append(response.Data, &proto.Data{
 			Id:         d.ID,
-			Data:       d.Data,
+			User:       d.User,
 			Status:     d.Status,
+			Type:       d.Type,
+			Data:       d.Data,
 			UploadedAt: d.UploadedAt,
 		})
 	}

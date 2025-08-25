@@ -7,10 +7,11 @@ import (
 	sq "github.com/Masterminds/squirrel"
 )
 
+// GetData retrieves all data for a specific user from the database
 func (s *Storage) GetData(ctx context.Context, user string) ([]models.Data, error) {
 	data := make([]models.Data, 0)
 
-	rows, err := sq.Select("id", "data", "uploaded_at").
+	rows, err := sq.Select("id", "user", "status", "type", "data", "uploaded_at").
 		From("storage").
 		Where(sq.Eq{"user": user}).
 		OrderBy("uploaded_at DESC").
@@ -24,7 +25,7 @@ func (s *Storage) GetData(ctx context.Context, user string) ([]models.Data, erro
 
 	for rows.Next() {
 		var o models.Data
-		err := rows.Scan(&o.ID, &o.Status, &o.Data, &o.UploadedAt)
+		err := rows.Scan(&o.ID, &o.User, &o.Status, &o.Type, &o.Data, &o.UploadedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -37,7 +38,7 @@ func (s *Storage) GetData(ctx context.Context, user string) ([]models.Data, erro
 	}
 
 	if len(data) == 0 {
-		return nil, ErrNoOrdersFound
+		return nil, ErrNoDataFound
 	}
 
 	return data, nil

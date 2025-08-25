@@ -19,7 +19,6 @@ import (
 func (m *MockVaultServer) DeleteData(ctx context.Context, req *proto.DeleteDataRequest) (*proto.DeleteDataResponse, error) {
 	fmt.Printf("DEBUG MockServer: DeleteData called with ID: %s, shouldSucceed: %t, validateJWT: %t\n", req.Id, m.shouldSucceed, m.validateJWT)
 
-	// Check JWT token from metadata if validation is enabled
 	if m.validateJWT {
 		md, ok := metadata.FromIncomingContext(ctx)
 		if !ok {
@@ -39,7 +38,7 @@ func (m *MockVaultServer) DeleteData(ctx context.Context, req *proto.DeleteDataR
 			return nil, status.Error(codes.Unauthenticated, "invalid authorization header format")
 		}
 
-		token := authHeader[7:] // Remove "Bearer " prefix
+		token := authHeader[7:] 
 		login, valid := m.ValidateTestJWT(token)
 		if !valid {
 			fmt.Printf("DEBUG MockServer: Invalid JWT token\n")
@@ -49,7 +48,6 @@ func (m *MockVaultServer) DeleteData(ctx context.Context, req *proto.DeleteDataR
 		fmt.Printf("DEBUG MockServer: JWT validated successfully for user: %s\n", login)
 	}
 
-	// If shouldSucceed is false, simulate server failure
 	if !m.shouldSucceed {
 		fmt.Printf("DEBUG MockServer: shouldSucceed is false, returning failure\n")
 		return &proto.DeleteDataResponse{
@@ -57,13 +55,11 @@ func (m *MockVaultServer) DeleteData(ctx context.Context, req *proto.DeleteDataR
 		}, nil
 	}
 
-	// Check if ID is empty
 	if req.Id == "" {
 		fmt.Printf("DEBUG MockServer: Empty ID provided\n")
 		return nil, status.Error(codes.InvalidArgument, "Data ID not provided")
 	}
 
-	// Success case
 	fmt.Printf("DEBUG MockServer: DeleteData successful for ID: %s\n", req.Id)
 	return &proto.DeleteDataResponse{
 		Success: true,
@@ -80,7 +76,6 @@ func TestDataVault_DeleteData_WithJWTIntegration(t *testing.T) {
 	client := SetupTestClient(t, lis)
 	ctx := context.Background()
 
-	// First, register a user to get a real JWT token
 	user := models.User{
 		Login:    "deletedatauser",
 		Password: "securepassword123",
@@ -90,7 +85,6 @@ func TestDataVault_DeleteData_WithJWTIntegration(t *testing.T) {
 	assert.NoError(t, err, "Registration should succeed")
 	assert.NotEmpty(t, jwt, "JWT should not be empty")
 
-	// Now test deleting data with the real JWT token
 	dataID := "test-data-id-123"
 	err = client.DeleteData(ctx, jwt, dataID)
 	assert.NoError(t, err, "DeleteData should succeed with valid JWT")
@@ -249,17 +243,15 @@ func TestDataVault_DeleteData(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt // capture range variable
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
 			client, ctx, cleanup := tt.setupFunc(t)
 			defer cleanup()
 
-			// Execute the delete data function
 			err := client.DeleteData(ctx, tt.jwt, tt.id)
 
-			// Validate the results
 			tt.validateResult(t, err)
 			if tt.expectedError {
 				assert.Error(t, err)
@@ -279,13 +271,11 @@ func TestDataVault_DeleteData_ContextCancellation(t *testing.T) {
 
 	client := SetupTestClient(t, lis)
 
-	// Test with cancelled context
 	ctx, cancel := context.WithCancel(context.Background())
-	cancel() // Cancel immediately
+	cancel()
 
 	err := client.DeleteData(ctx, expectedToken, "test-data-id")
 
-	// Should get an error due to cancelled context
 	assert.Error(t, err)
 }
 
@@ -298,16 +288,13 @@ func TestDataVault_DeleteData_ContextTimeout(t *testing.T) {
 
 	client := SetupTestClient(t, lis)
 
-	// Test with very short timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Nanosecond)
 	defer cancel()
 
-	// Wait a bit to ensure timeout
 	time.Sleep(1 * time.Millisecond)
 
 	err := client.DeleteData(ctx, expectedToken, "test-data-id")
 
-	// Should get an error due to timeout
 	assert.Error(t, err)
 }
 
@@ -321,7 +308,6 @@ func TestDataVault_DeleteData_MultipleConsecutive(t *testing.T) {
 	client := SetupTestClient(t, lis)
 	ctx := context.Background()
 
-	// Test multiple consecutive deletes
 	for i := 0; i < 3; i++ {
 		id := fmt.Sprintf("test-data-id-%d", i+1)
 		err := client.DeleteData(ctx, expectedToken, id)
@@ -339,8 +325,6 @@ func TestDataVault_DeleteData_NonExistentID(t *testing.T) {
 	client := SetupTestClient(t, lis)
 	ctx := context.Background()
 
-	// In mock server, all valid IDs succeed
-	// In real implementation, this might return a specific error for non-existent IDs
 	err := client.DeleteData(ctx, expectedToken, "non-existent-data-id")
 	assert.NoError(t, err, "Mock server allows deletion of non-existent ID")
 }
@@ -355,7 +339,6 @@ func TestDataVault_DeleteData_LongID(t *testing.T) {
 	client := SetupTestClient(t, lis)
 	ctx := context.Background()
 
-	// Test with very long ID
 	longID := string(make([]byte, 1000))
 	for i := range longID {
 		longID = longID[:i] + "a" + longID[i+1:]

@@ -15,8 +15,9 @@ message Data {
   string id = 1;
   string user = 2;
   string status = 3;
-  string data = 4;
-  string uploaded_at = 5;
+  string type = 4;
+  bytes data = 5;
+  string uploaded_at = 6;
 }
 
 // Request/Response messages for operations
@@ -39,7 +40,8 @@ message LoginResponse {
 }
 
 message PostDataRequest {
-  string data = 1;
+  string type = 1;
+  bytes data = 2;
 }
 
 message PostDataResponse {

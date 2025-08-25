@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// pingCmd represents the ping command
+// pingCmd tests server connectivity
 var pingCmd = &cobra.Command{
 	Use:   "ping",
 	Short: "Check server connectivity",
@@ -29,6 +29,7 @@ var pingCmd = &cobra.Command{
 	},
 }
 
+// init registers the ping command
 func init() {
 	rootCmd.AddCommand(pingCmd)
 }

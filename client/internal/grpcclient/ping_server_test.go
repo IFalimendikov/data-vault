@@ -10,21 +10,21 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// PingServer implements the mock PingServer method
-func (m *MockVaultServer) PingServer(ctx context.Context, req *proto.PingServerRequest) (*proto.PingServerResponse, error) {
-	fmt.Printf("DEBUG MockServer: PingServer called, shouldSucceed: %t\n", m.shouldSucceed)
+// PingDB implements the mock PingDB method
+func (m *MockVaultServer) PingDB(ctx context.Context, req *proto.PingDBRequest) (*proto.PingDBResponse, error) {
+	fmt.Printf("DEBUG MockServer: PingDB called, shouldSucceed: %t\n", m.shouldSucceed)
 
 	// If shouldSucceed is false, simulate server failure
 	if !m.shouldSucceed {
 		fmt.Printf("DEBUG MockServer: shouldSucceed is false, returning failure\n")
-		return &proto.PingServerResponse{
+		return &proto.PingDBResponse{
 			Success: false,
 		}, nil
 	}
 
 	// Success case
-	fmt.Printf("DEBUG MockServer: PingServer successful\n")
-	return &proto.PingServerResponse{
+	fmt.Printf("DEBUG MockServer: PingDB successful\n")
+	return &proto.PingDBResponse{
 		Success: true,
 	}, nil
 }

@@ -8,11 +8,13 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// PostData handles data storage requests
 func (g *Handler) PostData(ctx context.Context, in *proto.PostDataRequest) (*proto.PostDataResponse, error) {
 	var response *proto.PostDataResponse
 
 	data := in.Data
-	if len(data) == 0 {
+	dataType := in.Type
+	if len(data) == 0 || dataType == "" {
 		return nil, status.Error(codes.InvalidArgument, "Data not provided")
 	}
 
@@ -21,7 +23,7 @@ func (g *Handler) PostData(ctx context.Context, in *proto.PostDataRequest) (*pro
 		return nil, status.Error(codes.Unauthenticated, "User ID not found in context")
 	}
 
-	err := g.service.PostData(ctx, login, data)
+	err := g.service.PostData(ctx, login, dataType, data)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "Failed to post data")
 	}

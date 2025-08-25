@@ -12,8 +12,8 @@ import (
 
 // Client holds the gRPC client connection and configuration
 type Client struct {
-	cfg        config.Config            // Application configuration
-	ClientConn proto.VaultServiceClient // gRPC client connection
+	cfg        config.Config
+	ClientConn proto.VaultServiceClient
 }
 
 // New creates a new gRPC client instance with TLS connection

@@ -6,6 +6,7 @@ import (
 	env "github.com/joho/godotenv"
 )
 
+// Config holds server configuration settings
 type Config struct {
 	ServerAddr    string `env:"RUN_ADDRESS" envDefault:"localhost:8080"`
 	DatabaseURI   string `env:"DATABASE_URI"`
@@ -13,6 +14,7 @@ type Config struct {
 	EncryptionKey string `env:"ENCRYPTION_KEY" envDefault:"123"`
 }
 
+// New creates and loads a new configuration instance
 func New() (Config, error) {
 	cfg := Config{}
 

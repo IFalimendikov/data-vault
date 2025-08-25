@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.6
 // 	protoc        v5.28.3
-// source: internal/proto/vault.proto
+// source: vault.proto
 
 package proto
 
@@ -32,7 +32,7 @@ type User struct {
 
 func (x *User) Reset() {
 	*x = User{}
-	mi := &file_internal_proto_vault_proto_msgTypes[0]
+	mi := &file_vault_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -44,7 +44,7 @@ func (x *User) String() string {
 func (*User) ProtoMessage() {}
 
 func (x *User) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_vault_proto_msgTypes[0]
+	mi := &file_vault_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -57,7 +57,7 @@ func (x *User) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use User.ProtoReflect.Descriptor instead.
 func (*User) Descriptor() ([]byte, []int) {
-	return file_internal_proto_vault_proto_rawDescGZIP(), []int{0}
+	return file_vault_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *User) GetLogin() string {
@@ -80,15 +80,16 @@ type Data struct {
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	User          string                 `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
 	Status        string                 `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
-	Data          string                 `protobuf:"bytes,4,opt,name=data,proto3" json:"data,omitempty"`
-	UploadedAt    string                 `protobuf:"bytes,5,opt,name=uploaded_at,json=uploadedAt,proto3" json:"uploaded_at,omitempty"`
+	Type          string                 `protobuf:"bytes,4,opt,name=type,proto3" json:"type,omitempty"`
+	Data          []byte                 `protobuf:"bytes,5,opt,name=data,proto3" json:"data,omitempty"`
+	UploadedAt    string                 `protobuf:"bytes,6,opt,name=uploaded_at,json=uploadedAt,proto3" json:"uploaded_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Data) Reset() {
 	*x = Data{}
-	mi := &file_internal_proto_vault_proto_msgTypes[1]
+	mi := &file_vault_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -100,7 +101,7 @@ func (x *Data) String() string {
 func (*Data) ProtoMessage() {}
 
 func (x *Data) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_vault_proto_msgTypes[1]
+	mi := &file_vault_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -113,7 +114,7 @@ func (x *Data) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Data.ProtoReflect.Descriptor instead.
 func (*Data) Descriptor() ([]byte, []int) {
-	return file_internal_proto_vault_proto_rawDescGZIP(), []int{1}
+	return file_vault_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *Data) GetId() string {
@@ -137,11 +138,18 @@ func (x *Data) GetStatus() string {
 	return ""
 }
 
-func (x *Data) GetData() string {
+func (x *Data) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *Data) GetData() []byte {
 	if x != nil {
 		return x.Data
 	}
-	return ""
+	return nil
 }
 
 func (x *Data) GetUploadedAt() string {
@@ -161,7 +169,7 @@ type RegisterRequest struct {
 
 func (x *RegisterRequest) Reset() {
 	*x = RegisterRequest{}
-	mi := &file_internal_proto_vault_proto_msgTypes[2]
+	mi := &file_vault_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -173,7 +181,7 @@ func (x *RegisterRequest) String() string {
 func (*RegisterRequest) ProtoMessage() {}
 
 func (x *RegisterRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_vault_proto_msgTypes[2]
+	mi := &file_vault_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -186,7 +194,7 @@ func (x *RegisterRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterRequest.ProtoReflect.Descriptor instead.
 func (*RegisterRequest) Descriptor() ([]byte, []int) {
-	return file_internal_proto_vault_proto_rawDescGZIP(), []int{2}
+	return file_vault_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *RegisterRequest) GetUser() *User {
@@ -206,7 +214,7 @@ type RegisterResponse struct {
 
 func (x *RegisterResponse) Reset() {
 	*x = RegisterResponse{}
-	mi := &file_internal_proto_vault_proto_msgTypes[3]
+	mi := &file_vault_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -218,7 +226,7 @@ func (x *RegisterResponse) String() string {
 func (*RegisterResponse) ProtoMessage() {}
 
 func (x *RegisterResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_vault_proto_msgTypes[3]
+	mi := &file_vault_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -231,7 +239,7 @@ func (x *RegisterResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterResponse.ProtoReflect.Descriptor instead.
 func (*RegisterResponse) Descriptor() ([]byte, []int) {
-	return file_internal_proto_vault_proto_rawDescGZIP(), []int{3}
+	return file_vault_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *RegisterResponse) GetSuccess() bool {
@@ -257,7 +265,7 @@ type LoginRequest struct {
 
 func (x *LoginRequest) Reset() {
 	*x = LoginRequest{}
-	mi := &file_internal_proto_vault_proto_msgTypes[4]
+	mi := &file_vault_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -269,7 +277,7 @@ func (x *LoginRequest) String() string {
 func (*LoginRequest) ProtoMessage() {}
 
 func (x *LoginRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_vault_proto_msgTypes[4]
+	mi := &file_vault_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -282,7 +290,7 @@ func (x *LoginRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginRequest.ProtoReflect.Descriptor instead.
 func (*LoginRequest) Descriptor() ([]byte, []int) {
-	return file_internal_proto_vault_proto_rawDescGZIP(), []int{4}
+	return file_vault_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *LoginRequest) GetUser() *User {
@@ -302,7 +310,7 @@ type LoginResponse struct {
 
 func (x *LoginResponse) Reset() {
 	*x = LoginResponse{}
-	mi := &file_internal_proto_vault_proto_msgTypes[5]
+	mi := &file_vault_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -314,7 +322,7 @@ func (x *LoginResponse) String() string {
 func (*LoginResponse) ProtoMessage() {}
 
 func (x *LoginResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_vault_proto_msgTypes[5]
+	mi := &file_vault_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -327,7 +335,7 @@ func (x *LoginResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginResponse.ProtoReflect.Descriptor instead.
 func (*LoginResponse) Descriptor() ([]byte, []int) {
-	return file_internal_proto_vault_proto_rawDescGZIP(), []int{5}
+	return file_vault_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *LoginResponse) GetSuccess() bool {
@@ -346,14 +354,15 @@ func (x *LoginResponse) GetJwtToken() string {
 
 type PostDataRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Data          string                 `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+	Type          string                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
+	Data          []byte                 `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *PostDataRequest) Reset() {
 	*x = PostDataRequest{}
-	mi := &file_internal_proto_vault_proto_msgTypes[6]
+	mi := &file_vault_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -365,7 +374,7 @@ func (x *PostDataRequest) String() string {
 func (*PostDataRequest) ProtoMessage() {}
 
 func (x *PostDataRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_vault_proto_msgTypes[6]
+	mi := &file_vault_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -378,14 +387,21 @@ func (x *PostDataRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PostDataRequest.ProtoReflect.Descriptor instead.
 func (*PostDataRequest) Descriptor() ([]byte, []int) {
-	return file_internal_proto_vault_proto_rawDescGZIP(), []int{6}
+	return file_vault_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *PostDataRequest) GetData() string {
+func (x *PostDataRequest) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *PostDataRequest) GetData() []byte {
 	if x != nil {
 		return x.Data
 	}
-	return ""
+	return nil
 }
 
 type PostDataResponse struct {
@@ -397,7 +413,7 @@ type PostDataResponse struct {
 
 func (x *PostDataResponse) Reset() {
 	*x = PostDataResponse{}
-	mi := &file_internal_proto_vault_proto_msgTypes[7]
+	mi := &file_vault_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -409,7 +425,7 @@ func (x *PostDataResponse) String() string {
 func (*PostDataResponse) ProtoMessage() {}
 
 func (x *PostDataResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_vault_proto_msgTypes[7]
+	mi := &file_vault_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -422,7 +438,7 @@ func (x *PostDataResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PostDataResponse.ProtoReflect.Descriptor instead.
 func (*PostDataResponse) Descriptor() ([]byte, []int) {
-	return file_internal_proto_vault_proto_rawDescGZIP(), []int{7}
+	return file_vault_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *PostDataResponse) GetSuccess() bool {
@@ -440,7 +456,7 @@ type GetDataRequest struct {
 
 func (x *GetDataRequest) Reset() {
 	*x = GetDataRequest{}
-	mi := &file_internal_proto_vault_proto_msgTypes[8]
+	mi := &file_vault_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -452,7 +468,7 @@ func (x *GetDataRequest) String() string {
 func (*GetDataRequest) ProtoMessage() {}
 
 func (x *GetDataRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_vault_proto_msgTypes[8]
+	mi := &file_vault_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -465,7 +481,7 @@ func (x *GetDataRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDataRequest.ProtoReflect.Descriptor instead.
 func (*GetDataRequest) Descriptor() ([]byte, []int) {
-	return file_internal_proto_vault_proto_rawDescGZIP(), []int{8}
+	return file_vault_proto_rawDescGZIP(), []int{8}
 }
 
 type GetDataResponse struct {
@@ -477,7 +493,7 @@ type GetDataResponse struct {
 
 func (x *GetDataResponse) Reset() {
 	*x = GetDataResponse{}
-	mi := &file_internal_proto_vault_proto_msgTypes[9]
+	mi := &file_vault_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -489,7 +505,7 @@ func (x *GetDataResponse) String() string {
 func (*GetDataResponse) ProtoMessage() {}
 
 func (x *GetDataResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_vault_proto_msgTypes[9]
+	mi := &file_vault_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -502,7 +518,7 @@ func (x *GetDataResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDataResponse.ProtoReflect.Descriptor instead.
 func (*GetDataResponse) Descriptor() ([]byte, []int) {
-	return file_internal_proto_vault_proto_rawDescGZIP(), []int{9}
+	return file_vault_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *GetDataResponse) GetData() []*Data {
@@ -521,7 +537,7 @@ type DeleteDataRequest struct {
 
 func (x *DeleteDataRequest) Reset() {
 	*x = DeleteDataRequest{}
-	mi := &file_internal_proto_vault_proto_msgTypes[10]
+	mi := &file_vault_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -533,7 +549,7 @@ func (x *DeleteDataRequest) String() string {
 func (*DeleteDataRequest) ProtoMessage() {}
 
 func (x *DeleteDataRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_vault_proto_msgTypes[10]
+	mi := &file_vault_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -546,7 +562,7 @@ func (x *DeleteDataRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteDataRequest.ProtoReflect.Descriptor instead.
 func (*DeleteDataRequest) Descriptor() ([]byte, []int) {
-	return file_internal_proto_vault_proto_rawDescGZIP(), []int{10}
+	return file_vault_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *DeleteDataRequest) GetId() string {
@@ -565,7 +581,7 @@ type DeleteDataResponse struct {
 
 func (x *DeleteDataResponse) Reset() {
 	*x = DeleteDataResponse{}
-	mi := &file_internal_proto_vault_proto_msgTypes[11]
+	mi := &file_vault_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -577,7 +593,7 @@ func (x *DeleteDataResponse) String() string {
 func (*DeleteDataResponse) ProtoMessage() {}
 
 func (x *DeleteDataResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_vault_proto_msgTypes[11]
+	mi := &file_vault_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -590,7 +606,7 @@ func (x *DeleteDataResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteDataResponse.ProtoReflect.Descriptor instead.
 func (*DeleteDataResponse) Descriptor() ([]byte, []int) {
-	return file_internal_proto_vault_proto_rawDescGZIP(), []int{11}
+	return file_vault_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *DeleteDataResponse) GetSuccess() bool {
@@ -600,27 +616,27 @@ func (x *DeleteDataResponse) GetSuccess() bool {
 	return false
 }
 
-type PingServerRequest struct {
+type PingDBRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *PingServerRequest) Reset() {
-	*x = PingServerRequest{}
-	mi := &file_internal_proto_vault_proto_msgTypes[12]
+func (x *PingDBRequest) Reset() {
+	*x = PingDBRequest{}
+	mi := &file_vault_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *PingServerRequest) String() string {
+func (x *PingDBRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*PingServerRequest) ProtoMessage() {}
+func (*PingDBRequest) ProtoMessage() {}
 
-func (x *PingServerRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_vault_proto_msgTypes[12]
+func (x *PingDBRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_vault_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -631,33 +647,33 @@ func (x *PingServerRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use PingServerRequest.ProtoReflect.Descriptor instead.
-func (*PingServerRequest) Descriptor() ([]byte, []int) {
-	return file_internal_proto_vault_proto_rawDescGZIP(), []int{12}
+// Deprecated: Use PingDBRequest.ProtoReflect.Descriptor instead.
+func (*PingDBRequest) Descriptor() ([]byte, []int) {
+	return file_vault_proto_rawDescGZIP(), []int{12}
 }
 
-type PingServerResponse struct {
+type PingDBResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *PingServerResponse) Reset() {
-	*x = PingServerResponse{}
-	mi := &file_internal_proto_vault_proto_msgTypes[13]
+func (x *PingDBResponse) Reset() {
+	*x = PingDBResponse{}
+	mi := &file_vault_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *PingServerResponse) String() string {
+func (x *PingDBResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*PingServerResponse) ProtoMessage() {}
+func (*PingDBResponse) ProtoMessage() {}
 
-func (x *PingServerResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_proto_vault_proto_msgTypes[13]
+func (x *PingDBResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_vault_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -668,32 +684,33 @@ func (x *PingServerResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use PingServerResponse.ProtoReflect.Descriptor instead.
-func (*PingServerResponse) Descriptor() ([]byte, []int) {
-	return file_internal_proto_vault_proto_rawDescGZIP(), []int{13}
+// Deprecated: Use PingDBResponse.ProtoReflect.Descriptor instead.
+func (*PingDBResponse) Descriptor() ([]byte, []int) {
+	return file_vault_proto_rawDescGZIP(), []int{13}
 }
 
-func (x *PingServerResponse) GetSuccess() bool {
+func (x *PingDBResponse) GetSuccess() bool {
 	if x != nil {
 		return x.Success
 	}
 	return false
 }
 
-var File_internal_proto_vault_proto protoreflect.FileDescriptor
+var File_vault_proto protoreflect.FileDescriptor
 
-const file_internal_proto_vault_proto_rawDesc = "" +
+const file_vault_proto_rawDesc = "" +
 	"\n" +
-	"\x1ainternal/proto/vault.proto\x12\x05vault\"8\n" +
+	"\vvault.proto\x12\x05vault\"8\n" +
 	"\x04User\x12\x14\n" +
 	"\x05login\x18\x01 \x01(\tR\x05login\x12\x1a\n" +
-	"\bpassword\x18\x02 \x01(\tR\bpassword\"w\n" +
+	"\bpassword\x18\x02 \x01(\tR\bpassword\"\x8b\x01\n" +
 	"\x04Data\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04user\x18\x02 \x01(\tR\x04user\x12\x16\n" +
 	"\x06status\x18\x03 \x01(\tR\x06status\x12\x12\n" +
-	"\x04data\x18\x04 \x01(\tR\x04data\x12\x1f\n" +
-	"\vuploaded_at\x18\x05 \x01(\tR\n" +
+	"\x04type\x18\x04 \x01(\tR\x04type\x12\x12\n" +
+	"\x04data\x18\x05 \x01(\fR\x04data\x12\x1f\n" +
+	"\vuploaded_at\x18\x06 \x01(\tR\n" +
 	"uploadedAt\"2\n" +
 	"\x0fRegisterRequest\x12\x1f\n" +
 	"\x04user\x18\x01 \x01(\v2\v.vault.UserR\x04user\"I\n" +
@@ -704,9 +721,10 @@ const file_internal_proto_vault_proto_rawDesc = "" +
 	"\x04user\x18\x01 \x01(\v2\v.vault.UserR\x04user\"F\n" +
 	"\rLoginResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x1b\n" +
-	"\tjwt_token\x18\x02 \x01(\tR\bjwtToken\"%\n" +
+	"\tjwt_token\x18\x02 \x01(\tR\bjwtToken\"9\n" +
 	"\x0fPostDataRequest\x12\x12\n" +
-	"\x04data\x18\x01 \x01(\tR\x04data\",\n" +
+	"\x04type\x18\x01 \x01(\tR\x04type\x12\x12\n" +
+	"\x04data\x18\x02 \x01(\fR\x04data\",\n" +
 	"\x10PostDataResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\"\x10\n" +
 	"\x0eGetDataRequest\"2\n" +
@@ -715,34 +733,33 @@ const file_internal_proto_vault_proto_rawDesc = "" +
 	"\x11DeleteDataRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\".\n" +
 	"\x12DeleteDataResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess\"\x13\n" +
-	"\x11PingServerRequest\".\n" +
-	"\x12PingServerResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess2\xfc\x02\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\"\x0f\n" +
+	"\rPingDBRequest\"*\n" +
+	"\x0ePingDBResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess2\xf0\x02\n" +
 	"\fVaultService\x12;\n" +
 	"\bRegister\x12\x16.vault.RegisterRequest\x1a\x17.vault.RegisterResponse\x122\n" +
-	"\x05Login\x12\x13.vault.LoginRequest\x1a\x14.vault.LoginResponse\x12A\n" +
-	"\n" +
-	"PingServer\x12\x18.vault.PingServerRequest\x1a\x19.vault.PingServerResponse\x12;\n" +
+	"\x05Login\x12\x13.vault.LoginRequest\x1a\x14.vault.LoginResponse\x125\n" +
+	"\x06PingDB\x12\x14.vault.PingDBRequest\x1a\x15.vault.PingDBResponse\x12;\n" +
 	"\bPostData\x12\x16.vault.PostDataRequest\x1a\x17.vault.PostDataResponse\x128\n" +
 	"\aGetData\x12\x15.vault.GetDataRequest\x1a\x16.vault.GetDataResponse\x12A\n" +
 	"\n" +
 	"DeleteData\x12\x18.vault.DeleteDataRequest\x1a\x19.vault.DeleteDataResponseB\x10Z\x0einternal/protob\x06proto3"
 
 var (
-	file_internal_proto_vault_proto_rawDescOnce sync.Once
-	file_internal_proto_vault_proto_rawDescData []byte
+	file_vault_proto_rawDescOnce sync.Once
+	file_vault_proto_rawDescData []byte
 )
 
-func file_internal_proto_vault_proto_rawDescGZIP() []byte {
-	file_internal_proto_vault_proto_rawDescOnce.Do(func() {
-		file_internal_proto_vault_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_internal_proto_vault_proto_rawDesc), len(file_internal_proto_vault_proto_rawDesc)))
+func file_vault_proto_rawDescGZIP() []byte {
+	file_vault_proto_rawDescOnce.Do(func() {
+		file_vault_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_vault_proto_rawDesc), len(file_vault_proto_rawDesc)))
 	})
-	return file_internal_proto_vault_proto_rawDescData
+	return file_vault_proto_rawDescData
 }
 
-var file_internal_proto_vault_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
-var file_internal_proto_vault_proto_goTypes = []any{
+var file_vault_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_vault_proto_goTypes = []any{
 	(*User)(nil),               // 0: vault.User
 	(*Data)(nil),               // 1: vault.Data
 	(*RegisterRequest)(nil),    // 2: vault.RegisterRequest
@@ -755,22 +772,22 @@ var file_internal_proto_vault_proto_goTypes = []any{
 	(*GetDataResponse)(nil),    // 9: vault.GetDataResponse
 	(*DeleteDataRequest)(nil),  // 10: vault.DeleteDataRequest
 	(*DeleteDataResponse)(nil), // 11: vault.DeleteDataResponse
-	(*PingServerRequest)(nil),  // 12: vault.PingServerRequest
-	(*PingServerResponse)(nil), // 13: vault.PingServerResponse
+	(*PingDBRequest)(nil),      // 12: vault.PingDBRequest
+	(*PingDBResponse)(nil),     // 13: vault.PingDBResponse
 }
-var file_internal_proto_vault_proto_depIdxs = []int32{
+var file_vault_proto_depIdxs = []int32{
 	0,  // 0: vault.RegisterRequest.user:type_name -> vault.User
 	0,  // 1: vault.LoginRequest.user:type_name -> vault.User
 	1,  // 2: vault.GetDataResponse.data:type_name -> vault.Data
 	2,  // 3: vault.VaultService.Register:input_type -> vault.RegisterRequest
 	4,  // 4: vault.VaultService.Login:input_type -> vault.LoginRequest
-	12, // 5: vault.VaultService.PingServer:input_type -> vault.PingServerRequest
+	12, // 5: vault.VaultService.PingDB:input_type -> vault.PingDBRequest
 	6,  // 6: vault.VaultService.PostData:input_type -> vault.PostDataRequest
 	8,  // 7: vault.VaultService.GetData:input_type -> vault.GetDataRequest
 	10, // 8: vault.VaultService.DeleteData:input_type -> vault.DeleteDataRequest
 	3,  // 9: vault.VaultService.Register:output_type -> vault.RegisterResponse
 	5,  // 10: vault.VaultService.Login:output_type -> vault.LoginResponse
-	13, // 11: vault.VaultService.PingServer:output_type -> vault.PingServerResponse
+	13, // 11: vault.VaultService.PingDB:output_type -> vault.PingDBResponse
 	7,  // 12: vault.VaultService.PostData:output_type -> vault.PostDataResponse
 	9,  // 13: vault.VaultService.GetData:output_type -> vault.GetDataResponse
 	11, // 14: vault.VaultService.DeleteData:output_type -> vault.DeleteDataResponse
@@ -781,26 +798,26 @@ var file_internal_proto_vault_proto_depIdxs = []int32{
 	0,  // [0:3] is the sub-list for field type_name
 }
 
-func init() { file_internal_proto_vault_proto_init() }
-func file_internal_proto_vault_proto_init() {
-	if File_internal_proto_vault_proto != nil {
+func init() { file_vault_proto_init() }
+func file_vault_proto_init() {
+	if File_vault_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_proto_vault_proto_rawDesc), len(file_internal_proto_vault_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_vault_proto_rawDesc), len(file_vault_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_internal_proto_vault_proto_goTypes,
-		DependencyIndexes: file_internal_proto_vault_proto_depIdxs,
-		MessageInfos:      file_internal_proto_vault_proto_msgTypes,
+		GoTypes:           file_vault_proto_goTypes,
+		DependencyIndexes: file_vault_proto_depIdxs,
+		MessageInfos:      file_vault_proto_msgTypes,
 	}.Build()
-	File_internal_proto_vault_proto = out.File
-	file_internal_proto_vault_proto_goTypes = nil
-	file_internal_proto_vault_proto_depIdxs = nil
+	File_vault_proto = out.File
+	file_vault_proto_goTypes = nil
+	file_vault_proto_depIdxs = nil
 }

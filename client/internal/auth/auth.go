@@ -44,7 +44,7 @@ func SaveJWT(jwt, username string) error {
 		return err
 	}
 
-	return os.WriteFile(configPath, data, 0600) // 0600 = read/write for owner only
+	return os.WriteFile(configPath, data, 0600)
 }
 
 // LoadJWT loads JWT token from config file
@@ -57,7 +57,7 @@ func LoadJWT() (string, error) {
 	data, err := os.ReadFile(configPath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return "", nil // No saved JWT
+			return "", nil
 		}
 		return "", err
 	}
@@ -70,7 +70,7 @@ func LoadJWT() (string, error) {
 	return config.JWT, nil
 }
 
-// ClearJWT removes saved JWT (for logout)
+// ClearJWT removes saved JWT for logout
 func ClearJWT() error {
 	configPath, err := getConfigPath()
 	if err != nil {

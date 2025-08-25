@@ -7,10 +7,12 @@ import (
 	"errors"
 
 	"data-vault/server/internal/models"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
+// Register handles user registration requests
 func (g *Handler) Register(ctx context.Context, in *proto.RegisterRequest) (*proto.RegisterResponse, error) {
 	var response *proto.RegisterResponse
 

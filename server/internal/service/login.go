@@ -5,6 +5,7 @@ import (
 	"data-vault/server/internal/models"
 )
 
+// Login authenticates a user with encrypted password verification
 func (s *Vault) Login(ctx context.Context, user models.User) error {
 	if user.Login == "" || user.Password == "" {
 		return ErrMalformedRequest

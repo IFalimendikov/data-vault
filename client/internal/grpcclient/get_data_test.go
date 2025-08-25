@@ -59,13 +59,13 @@ func (m *MockVaultServer) GetData(ctx context.Context, req *proto.GetDataRequest
 	mockData := []*proto.Data{
 		{
 			Id:         "data-1",
-			Data:       "sample encrypted data 1",
+			Data:       []byte("sample encrypted data 1"),
 			Status:     "ACTIVE",
 			UploadedAt: "2025-08-24T10:00:00Z",
 		},
 		{
 			Id:         "data-2",
-			Data:       "sample encrypted data 2",
+			Data:       []byte("sample encrypted data 2"),
 			Status:     "ACTIVE",
 			UploadedAt: "2025-08-24T11:00:00Z",
 		},
@@ -105,7 +105,7 @@ func TestDataVault_GetData_WithJWTIntegration(t *testing.T) {
 
 	// Verify data structure
 	assert.Equal(t, "data-1", data[0].ID)
-	assert.Equal(t, "sample encrypted data 1", data[0].Data)
+	assert.Equal(t, "sample encrypted data 1", string(data[0].Data))
 	assert.Equal(t, "ACTIVE", data[0].Status)
 }
 
@@ -169,11 +169,11 @@ func TestDataVault_GetData(t *testing.T) {
 				assert.NoError(t, err, "Expected get data to succeed")
 				assert.Len(t, data, 2, "Expected 2 data items")
 				assert.Equal(t, "data-1", data[0].ID)
-				assert.Equal(t, "sample encrypted data 1", data[0].Data)
+				assert.Equal(t, "sample encrypted data 1", string(data[0].Data))
 				assert.Equal(t, "ACTIVE", data[0].Status)
 				assert.Equal(t, "2025-08-24T10:00:00Z", data[0].UploadedAt)
 				assert.Equal(t, "data-2", data[1].ID)
-				assert.Equal(t, "sample encrypted data 2", data[1].Data)
+				assert.Equal(t, "sample encrypted data 2", string(data[1].Data))
 			},
 		},
 		{

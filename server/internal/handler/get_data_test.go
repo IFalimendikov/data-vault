@@ -21,14 +21,16 @@ func TestGetData(t *testing.T) {
 			ID:         "data1",
 			User:       "testuser",
 			Status:     "active",
-			Data:       "encrypted data 1",
+			Type:       "text",
+			Data:       []byte("encrypted data 1"),
 			UploadedAt: "2024-01-01T00:00:00Z",
 		},
 		{
 			ID:         "data2",
 			User:       "testuser",
 			Status:     "active",
-			Data:       "encrypted data 2",
+			Type:       "text",
+			Data:       []byte("encrypted data 2"),
 			UploadedAt: "2024-01-02T00:00:00Z",
 		},
 	}
