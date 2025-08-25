@@ -117,7 +117,6 @@ func TestPostData(t *testing.T) {
 				ctx = context.Background()
 			}
 
-			// Only set up mock for valid requests
 			if len(tt.data) > 0 && tt.dataType != "" && tt.userID == "testuser" {
 				mockService.On("PostData", mock.Anything, "testuser", tt.dataType, tt.data).Return(tt.mockError)
 			}

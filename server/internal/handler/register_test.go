@@ -18,14 +18,14 @@ import (
 
 func TestRegister(t *testing.T) {
 	tests := []struct {
-		name           string
-		user           models.User
-		mockError      error
-		expectError    bool
-		expectedCode   codes.Code
-		expectedMsg    string
-		expectSuccess  bool
-		expectJWT      bool
+		name          string
+		user          models.User
+		mockError     error
+		expectError   bool
+		expectedCode  codes.Code
+		expectedMsg   string
+		expectSuccess bool
+		expectJWT     bool
 	}{
 		{
 			name:          "success",
@@ -78,7 +78,6 @@ func TestRegister(t *testing.T) {
 				},
 			}
 
-			// Only set up mock for valid requests
 			if tt.user.Login != "" && tt.user.Password != "" {
 				mockService.On("Register", mock.Anything, tt.user).Return(tt.mockError)
 			}

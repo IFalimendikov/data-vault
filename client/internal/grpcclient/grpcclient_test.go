@@ -48,15 +48,12 @@ func (m *MockVaultServer) GenerateTestJWT(login string) string {
 		IssuedAt:  time.Now().Unix(),
 	}
 
-	// Create a simple base64 encoded token for testing
-	// Format: header.payload.signature (simplified)
 	header := `{"alg":"HS256","typ":"JWT"}`
 	payload, _ := json.Marshal(claims)
 
 	headerB64 := base64.RawURLEncoding.EncodeToString([]byte(header))
 	payloadB64 := base64.RawURLEncoding.EncodeToString(payload)
 
-	// Simple signature using secret
 	signature := m.generateSignature(headerB64 + "." + payloadB64)
 	signatureB64 := base64.RawURLEncoding.EncodeToString([]byte(signature))
 
@@ -74,14 +71,12 @@ func (m *MockVaultServer) ValidateTestJWT(token string) (string, bool) {
 		return "", false
 	}
 
-	// Verify signature
 	expectedSig := m.generateSignature(parts[0] + "." + parts[1])
 	actualSig, err := base64.RawURLEncoding.DecodeString(parts[2])
 	if err != nil || string(actualSig) != expectedSig {
 		return "", false
 	}
 
-	// Decode payload
 	payload, err := base64.RawURLEncoding.DecodeString(parts[1])
 	if err != nil {
 		return "", false
@@ -92,7 +87,6 @@ func (m *MockVaultServer) ValidateTestJWT(token string) (string, bool) {
 		return "", false
 	}
 
-	// Check expiration
 	if time.Now().Unix() > claims.ExpiresAt {
 		return "", false
 	}
@@ -102,13 +96,11 @@ func (m *MockVaultServer) ValidateTestJWT(token string) (string, bool) {
 
 // generateSignature creates a simple signature for testing
 func (m *MockVaultServer) generateSignature(data string) string {
-	// Simple hash-like signature using secret
 	secret := m.jwtSecret
 	if secret == "" {
 		secret = "test-secret"
 	}
 
-	// Create a deterministic "signature" based on data and secret
 	combined := data + secret
 	hash := 0
 	for _, c := range combined {
@@ -138,11 +130,9 @@ func SetupMockServerWithJWT(shouldSucceed bool, expectedToken string, validateJW
 
 	go func() {
 		if err := baseServer.Serve(lis); err != nil {
-			// Log error in real scenario
 		}
 	}()
 
-	// Give the server time to start
 	time.Sleep(100 * time.Millisecond)
 
 	cleanup := func() {
@@ -170,7 +160,7 @@ func SetupTestClient(t *testing.T, lis *bufconn.Listener) *Client {
 		"bufnet",
 		grpc.WithContextDialer(BufDialer(lis)),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithBlock(), // ensure connection established before returning
+		grpc.WithBlock(),
 	)
 	require.NoError(t, err, "Failed to create gRPC connection")
 
@@ -187,12 +177,10 @@ func TestJWTGeneration(t *testing.T) {
 		jwtSecret:   "test-secret-key",
 	}
 
-	// Test JWT generation
 	token := mockServer.GenerateTestJWT("testuser")
 	require.NotEmpty(t, token, "Generated token should not be empty")
 	require.Contains(t, token, ".", "JWT should contain dots")
 
-	// Test JWT validation
 	login, valid := mockServer.ValidateTestJWT(token)
 	require.True(t, valid, "Token should be valid")
 	require.Equal(t, "testuser", login, "Login should match")
@@ -255,15 +243,12 @@ func TestJWTWithDifferentSecrets(t *testing.T) {
 		jwtSecret:   "secret2",
 	}
 
-	// Generate token with server1
 	token := server1.GenerateTestJWT("testuser")
 
-	// Validate with server1 (should work)
 	login1, valid1 := server1.ValidateTestJWT(token)
 	require.True(t, valid1, "Token should be valid with original secret")
 	require.Equal(t, "testuser", login1)
 
-	// Validate with server2 (should fail due to different secret)
 	_, valid2 := server2.ValidateTestJWT(token)
 	require.False(t, valid2, "Token should be invalid with different secret")
 }
@@ -278,7 +263,6 @@ func TestFullWorkflowWithJWTIntegration(t *testing.T) {
 	client := SetupTestClient(t, lis)
 	ctx := context.Background()
 
-	// Step 1: Register a user and get JWT
 	user := models.User{
 		Login:    "workflowuser",
 		Password: "workflowpassword123",
@@ -289,7 +273,6 @@ func TestFullWorkflowWithJWTIntegration(t *testing.T) {
 	require.NotEmpty(t, jwt, "JWT should not be empty")
 	require.Contains(t, jwt, ".", "JWT should be in proper format")
 
-	// Step 2: Validate the JWT token
 	mockServer := &MockVaultServer{
 		validateJWT: true,
 		jwtSecret:   jwtSecret,
@@ -298,22 +281,18 @@ func TestFullWorkflowWithJWTIntegration(t *testing.T) {
 	require.True(t, valid, "JWT should be valid")
 	require.Equal(t, user.Login, login, "JWT should contain correct login")
 
-	// Step 3: Use JWT to post data
 	testData := "This is test data for the full workflow"
 	err = client.PostData(ctx, jwt, "text", []byte(testData))
 	require.NoError(t, err, "PostData should succeed with valid JWT")
 
-	// Step 4: Use JWT to get data
 	data, err := client.GetData(ctx, jwt)
 	require.NoError(t, err, "GetData should succeed with valid JWT")
 	require.NotNil(t, data, "Data should not be nil")
 	require.Len(t, data, 2, "Should return mock data")
 
-	// Step 5: Use JWT to delete data
 	err = client.DeleteData(ctx, jwt, "test-data-id")
 	require.NoError(t, err, "DeleteData should succeed with valid JWT")
 
-	// Step 6: Test ping server (doesn't require JWT)
 	pingResult := client.PingServer(ctx)
 	require.True(t, pingResult, "PingServer should succeed")
 }
@@ -328,7 +307,6 @@ func TestJWTSecurityValidation(t *testing.T) {
 	client := SetupTestClient(t, lis)
 	ctx := context.Background()
 
-	// Register a legitimate user
 	legitimateUser := models.User{
 		Login:    "legitimate",
 		Password: "password123",
@@ -339,25 +317,20 @@ func TestJWTSecurityValidation(t *testing.T) {
 
 	testData := "Sensitive test data"
 
-	// Test 1: Valid JWT should work
 	err = client.PostData(ctx, validJWT, "text", []byte(testData))
 	assert.NoError(t, err, "Valid JWT should allow data posting")
 
-	// Test 2: Invalid JWT should be rejected
 	invalidJWT := "invalid.jwt.token"
 	err = client.PostData(ctx, invalidJWT, "text", []byte(testData))
 	assert.Error(t, err, "Invalid JWT should be rejected")
 
-	// Test 3: Empty JWT should be rejected
 	err = client.PostData(ctx, "", "text", []byte(testData))
 	assert.Error(t, err, "Empty JWT should be rejected")
 
-	// Test 4: Malformed JWT should be rejected
-	malformedJWT := "header.payload" // Missing signature
+	malformedJWT := "header.payload"
 	err = client.PostData(ctx, malformedJWT, "text", []byte(testData))
 	assert.Error(t, err, "Malformed JWT should be rejected")
 
-	// Test 5: JWT with wrong signature should be rejected
 	wrongSignatureJWT := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dpbiI6ImF0dGFja2VyIiwiZXhwIjo5OTk5OTk5OTk5LCJpYXQiOjE2MDAwMDAwMDB9.wrong_signature"
 	err = client.PostData(ctx, wrongSignatureJWT, "text", []byte(testData))
 	assert.Error(t, err, "JWT with wrong signature should be rejected")

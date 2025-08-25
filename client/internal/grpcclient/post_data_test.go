@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
@@ -19,7 +20,6 @@ import (
 func (m *MockVaultServer) PostData(ctx context.Context, req *proto.PostDataRequest) (*proto.PostDataResponse, error) {
 	fmt.Printf("DEBUG MockServer: PostData called with data length: %d, shouldSucceed: %t, validateJWT: %t\n", len(req.Data), m.shouldSucceed, m.validateJWT)
 
-	// Check JWT token from metadata if validation is enabled
 	if m.validateJWT {
 		md, ok := metadata.FromIncomingContext(ctx)
 		if !ok {
@@ -39,7 +39,7 @@ func (m *MockVaultServer) PostData(ctx context.Context, req *proto.PostDataReque
 			return nil, status.Error(codes.Unauthenticated, "invalid authorization header format")
 		}
 
-		token := authHeader[7:] // Remove "Bearer " prefix
+		token := authHeader[7:]
 		login, valid := m.ValidateTestJWT(token)
 		if !valid {
 			fmt.Printf("DEBUG MockServer: Invalid JWT token\n")
@@ -49,7 +49,6 @@ func (m *MockVaultServer) PostData(ctx context.Context, req *proto.PostDataReque
 		fmt.Printf("DEBUG MockServer: JWT validated successfully for user: %s\n", login)
 	}
 
-	// If shouldSucceed is false, simulate server failure
 	if !m.shouldSucceed {
 		fmt.Printf("DEBUG MockServer: shouldSucceed is false, returning failure\n")
 		return &proto.PostDataResponse{
@@ -57,13 +56,11 @@ func (m *MockVaultServer) PostData(ctx context.Context, req *proto.PostDataReque
 		}, nil
 	}
 
-	// Check if data is empty
 	if len(req.Data) == 0 {
 		fmt.Printf("DEBUG MockServer: Empty data provided\n")
 		return nil, status.Error(codes.InvalidArgument, "Data not provided")
 	}
 
-	// Success case
 	fmt.Printf("DEBUG MockServer: PostData successful\n")
 	return &proto.PostDataResponse{
 		Success: true,
@@ -80,7 +77,6 @@ func TestDataVault_PostData_WithJWTIntegration(t *testing.T) {
 	client := SetupTestClient(t, lis)
 	ctx := context.Background()
 
-	// First, register a user to get a real JWT token
 	user := models.User{
 		Login:    "postdatauser",
 		Password: "securepassword123",
@@ -90,7 +86,6 @@ func TestDataVault_PostData_WithJWTIntegration(t *testing.T) {
 	assert.NoError(t, err, "Registration should succeed")
 	assert.NotEmpty(t, jwt, "JWT should not be empty")
 
-	// Now test posting data with the real JWT token
 	testData := "This is some test data to be stored securely"
 	err = client.PostData(ctx, jwt, "text", []byte(testData))
 	assert.NoError(t, err, "PostData should succeed with valid JWT")
@@ -106,7 +101,6 @@ func TestDataVault_PostData_WithInvalidJWT(t *testing.T) {
 	client := SetupTestClient(t, lis)
 	ctx := context.Background()
 
-	// Test with invalid JWT
 	invalidJWT := "invalid.jwt.token"
 	testData := "This is some test data"
 
@@ -124,7 +118,6 @@ func TestDataVault_PostData_WithExpiredJWT(t *testing.T) {
 	client := SetupTestClient(t, lis)
 	ctx := context.Background()
 
-	// Test with a malformed JWT that will be rejected
 	expiredJWT := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dpbiI6InRlc3R1c2VyIiwiZXhwIjoxNjAwMDAwMDAwLCJpYXQiOjE2MDAwMDAwMDB9.invalid"
 
 	testData := "This is some test data"
@@ -142,42 +135,55 @@ func TestDataVault_PostData_MultipleUsersWithDifferentJWTs(t *testing.T) {
 	client := SetupTestClient(t, lis)
 	ctx := context.Background()
 
-	// Register multiple users
 	users := []models.User{
 		{Login: "user1", Password: "password1"},
 		{Login: "user2", Password: "password2"},
 		{Login: "user3", Password: "password3"},
 	}
 
-	// Test each user can post data with their own JWT
 	for i, user := range users {
 		t.Run(fmt.Sprintf("user_%d", i+1), func(t *testing.T) {
-			// Register user and get JWT
 			jwt, err := client.Register(ctx, user)
-			assert.NoError(t, err, "Registration should succeed for %s", user.Login)
-			assert.NotEmpty(t, jwt, "JWT should not be empty for %s", user.Login)
+			require.NoError(t, err)
+			require.NotEmpty(t, jwt)
 
-			// Post data with user's JWT
-			testData := fmt.Sprintf("Data from %s", user.Login)
-			err = client.PostData(ctx, jwt, "text", []byte(testData))
-			assert.NoError(t, err, "PostData should succeed for %s", user.Login)
+			err = client.PostData(ctx, jwt, "text", []byte("test data for "+user.Login))
+			require.NoError(t, err)
 		})
 	}
+}
+
+func TestDataVault_PostData_CrossSecretValidation(t *testing.T) {
+	t.Parallel()
+
+	_, lis1, cleanup1 := SetupMockServerWithJWT(true, "", true, "secret1")
+	defer cleanup1()
+
+	_, lis2, cleanup2 := SetupMockServerWithJWT(true, "", true, "secret2")
+	defer cleanup2()
+
+	client1 := SetupTestClient(t, lis1)
+	client2 := SetupTestClient(t, lis2)
+	ctx := context.Background()
+
+	user := models.User{Login: "testuser", Password: "password123"}
+	jwt, err := client1.Register(ctx, user)
+	require.NoError(t, err)
+
+	err = client2.PostData(ctx, jwt, "text", []byte("test data"))
+	require.Error(t, err, "Should fail to use JWT from server1 with server2")
 }
 
 func TestDataVault_PostData_JWTCrossValidation(t *testing.T) {
 	t.Parallel()
 
-	// Test that JWTs generated with different secrets don't work
 	jwtSecret1 := "secret1"
 	jwtSecret2 := "secret2"
 
-	// Setup server with secret1
 	_, lis1, cleanup1 := SetupMockServerWithJWT(true, "", true, jwtSecret1)
 	defer cleanup1()
 	client1 := SetupTestClient(t, lis1)
 
-	// Setup server with secret2
 	_, lis2, cleanup2 := SetupMockServerWithJWT(true, "", true, jwtSecret2)
 	defer cleanup2()
 	client2 := SetupTestClient(t, lis2)
@@ -185,11 +191,9 @@ func TestDataVault_PostData_JWTCrossValidation(t *testing.T) {
 	ctx := context.Background()
 	user := models.User{Login: "testuser", Password: "testpass"}
 
-	// Register user with server1 and get JWT
 	jwt1, err := client1.Register(ctx, user)
 	assert.NoError(t, err, "Registration should succeed with server1")
 
-	// Try to use JWT from server1 with server2 (should fail)
 	testData := "Cross-validation test data"
 	err = client2.PostData(ctx, jwt1, "text", []byte(testData))
 	assert.Error(t, err, "PostData should fail when using JWT from different server")
@@ -275,7 +279,7 @@ func TestDataVault_PostData(t *testing.T) {
 				return client, context.Background(), cleanup
 			},
 			jwt:           "valid-jwt-token-456",
-			data:          string(make([]byte, 10000)), // Large data content
+			data:          string(make([]byte, 10000)),
 			expectedError: false,
 			validateResult: func(t *testing.T, err error) {
 				assert.NoError(t, err, "Expected post data with large content to succeed")
@@ -299,15 +303,14 @@ func TestDataVault_PostData(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt // capture range variable
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
 			client, ctx, cleanup := tt.setupFunc(t)
 			defer cleanup()
 
-			// Execute the post data function
-			err := client.PostData(ctx, tt.jwt, "text", []byte(tt.data)) // Validate the results
+			err := client.PostData(ctx, tt.jwt, "text", []byte(tt.data))
 			tt.validateResult(t, err)
 			if tt.expectedError {
 				assert.Error(t, err)
@@ -327,13 +330,11 @@ func TestDataVault_PostData_ContextCancellation(t *testing.T) {
 
 	client := SetupTestClient(t, lis)
 
-	// Test with cancelled context
 	ctx, cancel := context.WithCancel(context.Background())
-	cancel() // Cancel immediately
+	cancel()
 
 	err := client.PostData(ctx, expectedToken, "text", []byte("test data"))
 
-	// Should get an error due to cancelled context
 	assert.Error(t, err)
 }
 
@@ -346,16 +347,13 @@ func TestDataVault_PostData_ContextTimeout(t *testing.T) {
 
 	client := SetupTestClient(t, lis)
 
-	// Test with very short timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Nanosecond)
 	defer cancel()
 
-	// Wait a bit to ensure timeout
 	time.Sleep(1 * time.Millisecond)
 
 	err := client.PostData(ctx, expectedToken, "text", []byte("test data"))
 
-	// Should get an error due to timeout
 	assert.Error(t, err)
 }
 
@@ -369,7 +367,6 @@ func TestDataVault_PostData_MultipleConsecutive(t *testing.T) {
 	client := SetupTestClient(t, lis)
 	ctx := context.Background()
 
-	// Test multiple consecutive posts
 	for i := 0; i < 3; i++ {
 		data := fmt.Sprintf("test data item %d", i+1)
 		err := client.PostData(ctx, expectedToken, "text", []byte(data))

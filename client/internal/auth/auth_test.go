@@ -21,17 +21,14 @@ func TestGetConfigPath(t *testing.T) {
 }
 
 func TestSaveAndLoadJWT(t *testing.T) {
-	// Test data
 	testJWT := "test.jwt.token"
 	testUsername := "testuser"
 
-	// Save JWT
 	err := SaveJWT(testJWT, testUsername)
 	if err != nil {
 		t.Fatalf("Expected no error saving JWT, got %v", err)
 	}
 
-	// Load JWT
 	loadedJWT, err := LoadJWT()
 	if err != nil {
 		t.Fatalf("Expected no error loading JWT, got %v", err)
@@ -41,7 +38,6 @@ func TestSaveAndLoadJWT(t *testing.T) {
 		t.Errorf("Expected JWT %s, got %s", testJWT, loadedJWT)
 	}
 
-	// Clean up
 	err = ClearJWT()
 	if err != nil {
 		t.Fatalf("Expected no error clearing JWT, got %v", err)
@@ -49,7 +45,6 @@ func TestSaveAndLoadJWT(t *testing.T) {
 }
 
 func TestLoadJWTNotExists(t *testing.T) {
-	// Ensure no JWT exists
 	_ = ClearJWT()
 
 	jwt, err := LoadJWT()
@@ -63,7 +58,6 @@ func TestLoadJWTNotExists(t *testing.T) {
 }
 
 func TestClearJWT(t *testing.T) {
-	// First save a JWT
 	testJWT := "test.jwt.token"
 	testUsername := "testuser"
 	err := SaveJWT(testJWT, testUsername)
@@ -71,13 +65,11 @@ func TestClearJWT(t *testing.T) {
 		t.Fatalf("Expected no error saving JWT, got %v", err)
 	}
 
-	// Clear JWT
 	err = ClearJWT()
 	if err != nil {
 		t.Fatalf("Expected no error clearing JWT, got %v", err)
 	}
 
-	// Verify it's cleared
 	jwt, err := LoadJWT()
 	if err != nil {
 		t.Fatalf("Expected no error loading JWT after clear, got %v", err)
@@ -89,10 +81,8 @@ func TestClearJWT(t *testing.T) {
 }
 
 func TestClearJWTNotExists(t *testing.T) {
-	// Ensure no JWT exists
 	_ = ClearJWT()
 
-	// Try to clear again
 	err := ClearJWT()
 	if err != nil {
 		t.Fatalf("Expected no error clearing non-existent JWT, got %v", err)

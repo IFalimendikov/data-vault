@@ -19,7 +19,6 @@ func (m *MockVaultServer) Register(ctx context.Context, req *proto.RegisterReque
 		m.registeredUsers = make(map[string]string)
 	}
 
-	// Check for duplicate user
 	if _, exists := m.registeredUsers[req.User.Login]; exists {
 		fmt.Printf("DEBUG MockServer: Duplicate user detected: %s\n", req.User.Login)
 		return &proto.RegisterResponse{
@@ -28,7 +27,6 @@ func (m *MockVaultServer) Register(ctx context.Context, req *proto.RegisterReque
 		}, nil
 	}
 
-	// If shouldSucceed is false, simulate server failure
 	if !m.shouldSucceed {
 		fmt.Printf("DEBUG MockServer: shouldSucceed is false, returning failure\n")
 		return &proto.RegisterResponse{
@@ -37,11 +35,9 @@ func (m *MockVaultServer) Register(ctx context.Context, req *proto.RegisterReque
 		}, nil
 	}
 
-	// Success case - store the user with their password
 	fmt.Printf("DEBUG MockServer: Registration successful for: %s\n", req.User.Login)
 	m.registeredUsers[req.User.Login] = req.User.Password
 
-	// Generate JWT token if validation is enabled
 	var jwtToken string
 	if m.validateJWT {
 		jwtToken = m.GenerateTestJWT(req.User.Login)
@@ -115,7 +111,7 @@ func TestDataVault_Register(t *testing.T) {
 				Login:    "",
 				Password: gofakeit.Password(true, true, true, true, false, 10),
 			},
-			wantErr: true, // Server should handle validation
+			wantErr: true,
 		},
 		{
 			name: "empty password",
@@ -123,7 +119,7 @@ func TestDataVault_Register(t *testing.T) {
 				Login:    gofakeit.Username(),
 				Password: "",
 			},
-			wantErr: true, // Server should handle validation
+			wantErr: true,
 		},
 		{
 			name: "both empty credentials",
@@ -131,7 +127,7 @@ func TestDataVault_Register(t *testing.T) {
 				Login:    "",
 				Password: "",
 			},
-			wantErr: true, // Server should handle validation
+			wantErr: true,
 		},
 	}
 
@@ -168,13 +164,11 @@ func TestDataVault_Register_WithJWTValidation(t *testing.T) {
 		Password: "jwtpassword123",
 	}
 
-	// Test registration with JWT validation
 	jwt, err := client.Register(context.Background(), user)
 	assert.NoError(t, err, "Registration should succeed")
 	assert.NotEmpty(t, jwt, "JWT should not be empty")
 	assert.Contains(t, jwt, ".", "JWT should contain dots")
 
-	// Validate the returned JWT
 	mockServer := &MockVaultServer{
 		validateJWT: true,
 		jwtSecret:   jwtSecret,
@@ -226,12 +220,10 @@ func TestDataVault_Register_JWTIntegrity(t *testing.T) {
 
 			client := SetupTestClient(t, lis)
 
-			// Register user
 			jwt, err := client.Register(context.Background(), tt.user)
 			assert.NoError(t, err, "Registration should succeed")
 			assert.NotEmpty(t, jwt, "JWT should not be empty")
 
-			// Validate JWT integrity
 			mockServer := &MockVaultServer{
 				validateJWT: true,
 				jwtSecret:   tt.jwtSecret,
@@ -252,19 +244,16 @@ func TestDataVault_Register_DuplicateUser(t *testing.T) {
 	client := SetupTestClient(t, lis)
 
 	baseUser := models.User{
-		// Use a deterministic login to avoid random collision with earlier tests
 		Login:    "duplicate_user_test_login",
 		Password: gofakeit.Password(true, true, true, true, false, 10),
 	}
 
 	ctx := context.Background()
 
-	// First registration should succeed
 	token, err := client.Register(ctx, baseUser)
 	require.NoError(t, err)
 	require.Equal(t, expectedToken, token)
 
-	// Second registration with same user should fail
 	token, err = client.Register(ctx, baseUser)
 	assert.Error(t, err)
 	assert.Equal(t, ErrorRegister, err)

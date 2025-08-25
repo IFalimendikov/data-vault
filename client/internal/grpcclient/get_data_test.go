@@ -19,7 +19,6 @@ import (
 func (m *MockVaultServer) GetData(ctx context.Context, req *proto.GetDataRequest) (*proto.GetDataResponse, error) {
 	fmt.Printf("DEBUG MockServer: GetData called, shouldSucceed: %t, validateJWT: %t\n", m.shouldSucceed, m.validateJWT)
 
-	// Check JWT token from metadata if validation is enabled
 	if m.validateJWT {
 		md, ok := metadata.FromIncomingContext(ctx)
 		if !ok {
@@ -39,7 +38,7 @@ func (m *MockVaultServer) GetData(ctx context.Context, req *proto.GetDataRequest
 			return nil, status.Error(codes.Unauthenticated, "invalid authorization header format")
 		}
 
-		token := authHeader[7:] // Remove "Bearer " prefix
+		token := authHeader[7:]
 		login, valid := m.ValidateTestJWT(token)
 		if !valid {
 			fmt.Printf("DEBUG MockServer: Invalid JWT token\n")
@@ -49,13 +48,11 @@ func (m *MockVaultServer) GetData(ctx context.Context, req *proto.GetDataRequest
 		fmt.Printf("DEBUG MockServer: JWT validated successfully for user: %s\n", login)
 	}
 
-	// If shouldSucceed is false, simulate server failure
 	if !m.shouldSucceed {
 		fmt.Printf("DEBUG MockServer: shouldSucceed is false, returning failure\n")
 		return nil, status.Error(codes.Internal, "server failure")
 	}
 
-	// Return mock data
 	mockData := []*proto.Data{
 		{
 			Id:         "data-1",
@@ -87,7 +84,6 @@ func TestDataVault_GetData_WithJWTIntegration(t *testing.T) {
 	client := SetupTestClient(t, lis)
 	ctx := context.Background()
 
-	// First, register a user to get a real JWT token
 	user := models.User{
 		Login:    "getdatauser",
 		Password: "securepassword123",
@@ -97,13 +93,11 @@ func TestDataVault_GetData_WithJWTIntegration(t *testing.T) {
 	assert.NoError(t, err, "Registration should succeed")
 	assert.NotEmpty(t, jwt, "JWT should not be empty")
 
-	// Now test getting data with the real JWT token
 	data, err := client.GetData(ctx, jwt)
 	assert.NoError(t, err, "GetData should succeed with valid JWT")
 	assert.NotNil(t, data, "Data should not be nil")
 	assert.Len(t, data, 2, "Should return 2 mock data items")
 
-	// Verify data structure
 	assert.Equal(t, "data-1", data[0].ID)
 	assert.Equal(t, "sample encrypted data 1", string(data[0].Data))
 	assert.Equal(t, "ACTIVE", data[0].Status)
@@ -119,7 +113,6 @@ func TestDataVault_GetData_WithInvalidJWT(t *testing.T) {
 	client := SetupTestClient(t, lis)
 	ctx := context.Background()
 
-	// Test with invalid JWT
 	invalidJWT := "invalid.jwt.token"
 
 	data, err := client.GetData(ctx, invalidJWT)
@@ -137,7 +130,6 @@ func TestDataVault_GetData_WithoutJWT(t *testing.T) {
 	client := SetupTestClient(t, lis)
 	ctx := context.Background()
 
-	// Test with empty JWT
 	data, err := client.GetData(ctx, "")
 	assert.Error(t, err, "GetData should fail with empty JWT")
 	assert.Nil(t, data, "Data should be nil on error")
@@ -200,10 +192,9 @@ func TestDataVault_GetData(t *testing.T) {
 				return client, context.Background(), cleanup
 			},
 			jwt:           "",
-			expectedError: true, // Empty JWT still allows the call, but server would normally reject
+			expectedError: true,
 			expectedCount: 2,
 			validateResult: func(t *testing.T, data []models.Data, err error) {
-				// In real scenario, server would reject, but mock server returns data
 				assert.Error(t, err, "JWT token is empty")
 			},
 		},
@@ -216,7 +207,7 @@ func TestDataVault_GetData(t *testing.T) {
 				return client, context.Background(), cleanup
 			},
 			jwt:           "expired-jwt-token",
-			expectedError: false, // Mock server doesn't validate expiration
+			expectedError: false,
 			expectedCount: 2,
 			validateResult: func(t *testing.T, data []models.Data, err error) {
 				assert.NoError(t, err, "Mock server returns data with expired token format")
@@ -226,17 +217,15 @@ func TestDataVault_GetData(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt // capture range variable
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
 			client, ctx, cleanup := tt.setupFunc(t)
 			defer cleanup()
 
-			// Execute the get data function
 			data, err := client.GetData(ctx, tt.jwt)
 
-			// Validate the results
 			tt.validateResult(t, data, err)
 			if tt.expectedError {
 				assert.Error(t, err)
@@ -256,13 +245,11 @@ func TestDataVault_GetData_ContextCancellation(t *testing.T) {
 
 	client := SetupTestClient(t, lis)
 
-	// Test with cancelled context
 	ctx, cancel := context.WithCancel(context.Background())
-	cancel() // Cancel immediately
+	cancel()
 
 	data, err := client.GetData(ctx, expectedToken)
 
-	// Should get an error due to cancelled context
 	assert.Error(t, err)
 	assert.Nil(t, data)
 }
@@ -276,16 +263,13 @@ func TestDataVault_GetData_ContextTimeout(t *testing.T) {
 
 	client := SetupTestClient(t, lis)
 
-	// Test with very short timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Nanosecond)
 	defer cancel()
 
-	// Wait a bit to ensure timeout
 	time.Sleep(1 * time.Millisecond)
 
 	data, err := client.GetData(ctx, expectedToken)
 
-	// Should get an error due to timeout
 	assert.Error(t, err)
 	assert.Nil(t, data)
 }
@@ -300,7 +284,6 @@ func TestDataVault_GetData_MultipleConsecutive(t *testing.T) {
 	client := SetupTestClient(t, lis)
 	ctx := context.Background()
 
-	// Test multiple consecutive gets
 	for i := 0; i < 3; i++ {
 		data, err := client.GetData(ctx, expectedToken)
 		assert.NoError(t, err, "Expected get data %d to succeed", i+1)
@@ -311,7 +294,6 @@ func TestDataVault_GetData_MultipleConsecutive(t *testing.T) {
 func TestDataVault_GetData_EmptyResponse(t *testing.T) {
 	t.Parallel()
 
-	// Test scenario where server returns empty data list
 	expectedToken := "empty-data-token"
 	_, lis, cleanup := SetupMockServer(true, expectedToken)
 	defer cleanup()
@@ -319,12 +301,9 @@ func TestDataVault_GetData_EmptyResponse(t *testing.T) {
 	client := SetupTestClient(t, lis)
 	ctx := context.Background()
 
-	// Note: This test uses the current mock implementation which always returns 2 items
-	// In a real test, you might want a separate mock that returns empty data
 	data, err := client.GetData(ctx, expectedToken)
 
 	assert.NoError(t, err, "Expected get data to succeed")
-	// Current mock always returns 2 items, but in real implementation empty response would be valid
 	assert.NotNil(t, data, "Data slice should not be nil even if empty")
 }
 
@@ -342,7 +321,6 @@ func TestDataVault_GetData_DataIntegrity(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, data, 2)
 
-	// Verify all fields are properly mapped from proto to models
 	for i, item := range data {
 		assert.NotEmpty(t, item.ID, "Data item %d should have non-empty ID", i)
 		assert.NotEmpty(t, item.Data, "Data item %d should have non-empty Data", i)

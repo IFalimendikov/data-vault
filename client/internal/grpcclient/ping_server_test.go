@@ -14,7 +14,6 @@ import (
 func (m *MockVaultServer) PingDB(ctx context.Context, req *proto.PingDBRequest) (*proto.PingDBResponse, error) {
 	fmt.Printf("DEBUG MockServer: PingDB called, shouldSucceed: %t\n", m.shouldSucceed)
 
-	// If shouldSucceed is false, simulate server failure
 	if !m.shouldSucceed {
 		fmt.Printf("DEBUG MockServer: shouldSucceed is false, returning failure\n")
 		return &proto.PingDBResponse{
@@ -22,7 +21,6 @@ func (m *MockVaultServer) PingDB(ctx context.Context, req *proto.PingDBRequest) 
 		}, nil
 	}
 
-	// Success case
 	fmt.Printf("DEBUG MockServer: PingDB successful\n")
 	return &proto.PingDBResponse{
 		Success: true,
@@ -68,7 +66,7 @@ func TestDataVault_PingServer(t *testing.T) {
 				_, lis, cleanup := SetupMockServer(true, "")
 				client := SetupTestClient(t, lis)
 				ctx, cancel := context.WithCancel(context.Background())
-				cancel() // Cancel immediately
+				cancel()
 				return client, ctx, cleanup
 			},
 			expectedResult: false,
@@ -83,7 +81,6 @@ func TestDataVault_PingServer(t *testing.T) {
 				client := SetupTestClient(t, lis)
 				ctx, cancel := context.WithTimeout(context.Background(), 1*time.Nanosecond)
 				t.Cleanup(cancel)
-				// Wait a bit to ensure timeout
 				time.Sleep(1 * time.Millisecond)
 				return client, ctx, cleanup
 			},
@@ -107,17 +104,15 @@ func TestDataVault_PingServer(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt // capture range variable
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
 			client, ctx, cleanup := tt.setupFunc(t)
 			defer cleanup()
 
-			// Execute the ping function
 			result := client.PingServer(ctx)
 
-			// Validate the results
 			tt.validateResult(t, result)
 			assert.Equal(t, tt.expectedResult, result)
 		})
@@ -133,7 +128,6 @@ func TestDataVault_PingServer_MultipleConsecutive(t *testing.T) {
 	client := SetupTestClient(t, lis)
 	ctx := context.Background()
 
-	// Test multiple consecutive pings
 	for i := 0; i < 5; i++ {
 		result := client.PingServer(ctx)
 		assert.True(t, result, "Expected ping %d to succeed", i+1)
@@ -143,7 +137,6 @@ func TestDataVault_PingServer_MultipleConsecutive(t *testing.T) {
 func TestDataVault_PingServer_AlternatingServerStates(t *testing.T) {
 	t.Parallel()
 
-	// Test with healthy server
 	_, lis1, cleanup1 := SetupMockServer(true, "")
 	defer cleanup1()
 	client1 := SetupTestClient(t, lis1)
@@ -151,7 +144,6 @@ func TestDataVault_PingServer_AlternatingServerStates(t *testing.T) {
 	result1 := client1.PingServer(context.Background())
 	assert.True(t, result1, "Expected ping to healthy server to succeed")
 
-	// Test with unhealthy server
 	_, lis2, cleanup2 := SetupMockServer(false, "")
 	defer cleanup2()
 	client2 := SetupTestClient(t, lis2)
@@ -168,7 +160,6 @@ func TestDataVault_PingServer_ContextWithDeadline(t *testing.T) {
 
 	client := SetupTestClient(t, lis)
 
-	// Test with a reasonable deadline
 	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(5*time.Second))
 	defer cancel()
 
@@ -184,7 +175,6 @@ func TestDataVault_PingServer_EmptyContext(t *testing.T) {
 
 	client := SetupTestClient(t, lis)
 
-	// Test with empty context (should still work)
 	result := client.PingServer(context.Background())
 	assert.True(t, result, "Expected ping with background context to succeed")
 }

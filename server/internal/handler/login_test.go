@@ -79,7 +79,6 @@ func TestLogin(t *testing.T) {
 				},
 			}
 
-			// Only set up mock for valid requests
 			if tt.user.Login != "" && tt.user.Password != "" {
 				mockService.On("Login", mock.Anything, tt.user).Return(tt.mockError)
 			}
@@ -99,7 +98,6 @@ func TestLogin(t *testing.T) {
 				assert.Equal(t, tt.expectSuccess, response.Success)
 				if tt.expectJWT {
 					assert.NotEmpty(t, response.JwtToken)
-					// Validate JWT token structure
 					token, err := jwt.ParseWithClaims(response.JwtToken, &Claim{}, func(token *jwt.Token) (interface{}, error) {
 						return []byte(handler.cfg.JWTSecret), nil
 					})

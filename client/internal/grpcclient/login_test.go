@@ -20,7 +20,6 @@ func (m *MockVaultServer) Login(ctx context.Context, req *proto.LoginRequest) (*
 		m.registeredUsers = make(map[string]string)
 	}
 
-	// If shouldSucceed is false, simulate server failure
 	if !m.shouldSucceed {
 		fmt.Printf("DEBUG MockServer: shouldSucceed is false, returning failure\n")
 		return &proto.LoginResponse{
@@ -29,7 +28,6 @@ func (m *MockVaultServer) Login(ctx context.Context, req *proto.LoginRequest) (*
 		}, nil
 	}
 
-	// Check if user exists and password matches
 	if storedPassword, exists := m.registeredUsers[req.User.Login]; !exists || storedPassword != req.User.Password {
 		fmt.Printf("DEBUG MockServer: Login failed - user not found or wrong password: %s\n", req.User.Login)
 		return &proto.LoginResponse{
@@ -38,10 +36,8 @@ func (m *MockVaultServer) Login(ctx context.Context, req *proto.LoginRequest) (*
 		}, nil
 	}
 
-	// Success case
 	fmt.Printf("DEBUG MockServer: Login successful for: %s\n", req.User.Login)
 
-	// Generate JWT token if validation is enabled
 	var jwtToken string
 	if m.validateJWT {
 		jwtToken = m.GenerateTestJWT(req.User.Login)
@@ -54,7 +50,7 @@ func (m *MockVaultServer) Login(ctx context.Context, req *proto.LoginRequest) (*
 		Success:  true,
 		JwtToken: jwtToken,
 	}, nil
-} // SetupMockServer creates a mock gRPC server for testing
+}
 
 func TestDataVault_Login(t *testing.T) {
 	t.Parallel()
@@ -74,7 +70,6 @@ func TestDataVault_Login(t *testing.T) {
 				_, lis, cleanup := SetupMockServer(true, expectedToken)
 				client := SetupTestClient(t, lis)
 
-				// Pre-register a user for login test
 				user := models.User{
 					Login:    "testuser",
 					Password: "securepassword123",
@@ -103,7 +98,6 @@ func TestDataVault_Login(t *testing.T) {
 				_, lis, cleanup := SetupMockServer(true, expectedToken)
 				client := SetupTestClient(t, lis)
 
-				// Pre-register a user with correct password
 				user := models.User{
 					Login:    "testuser2",
 					Password: "correctpassword",
@@ -192,7 +186,6 @@ func TestDataVault_Login(t *testing.T) {
 				_, lis, cleanup := SetupMockServer(true, expectedToken)
 				client := SetupTestClient(t, lis)
 
-				// Pre-register a user
 				user := models.User{
 					Login:    "testuser3",
 					Password: "validpassword123",
@@ -217,7 +210,6 @@ func TestDataVault_Login(t *testing.T) {
 		{
 			name: "server failure during login",
 			setupFunc: func(t *testing.T) (*Client, context.Context, func()) {
-				// Setup server that always fails
 				_, lis, cleanup := SetupMockServer(false, "")
 				client := SetupTestClient(t, lis)
 				return client, context.Background(), cleanup
@@ -241,7 +233,6 @@ func TestDataVault_Login(t *testing.T) {
 				_, lis, cleanup := SetupMockServer(true, expectedToken)
 				client := SetupTestClient(t, lis)
 
-				// Pre-register a user with special characters
 				user := models.User{
 					Login:    "user@example.com",
 					Password: "p@ssw0rd!#$%",
@@ -266,17 +257,15 @@ func TestDataVault_Login(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt // capture range variable
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
 			client, ctx, cleanup := tt.setupFunc(t)
 			defer cleanup()
 
-			// Execute the login function
 			token, err := client.Login(ctx, tt.user)
 
-			// Validate the results
 			tt.validateResult(t, token, err)
 		})
 	}
@@ -310,7 +299,6 @@ func TestDataVault_Login_ContextCancellation(t *testing.T) {
 
 	client := SetupTestClient(t, lis)
 
-	// Register a user first
 	user := models.User{
 		Login:    "contextuser",
 		Password: "contextpassword",
@@ -318,13 +306,11 @@ func TestDataVault_Login_ContextCancellation(t *testing.T) {
 	_, err := client.Register(context.Background(), user)
 	require.NoError(t, err)
 
-	// Test with cancelled context
 	ctx, cancel := context.WithCancel(context.Background())
-	cancel() // Cancel immediately
+	cancel()
 
 	token, err := client.Login(ctx, user)
 
-	// Should get an error due to cancelled context
 	assert.Error(t, err)
 	assert.Empty(t, token)
 }
@@ -338,7 +324,6 @@ func TestDataVault_Login_ContextTimeout(t *testing.T) {
 
 	client := SetupTestClient(t, lis)
 
-	// Register a user first
 	user := models.User{
 		Login:    "timeoutuser",
 		Password: "timeoutpassword",
@@ -346,16 +331,13 @@ func TestDataVault_Login_ContextTimeout(t *testing.T) {
 	_, err := client.Register(context.Background(), user)
 	require.NoError(t, err)
 
-	// Test with very short timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Nanosecond)
 	defer cancel()
 
-	// Wait a bit to ensure timeout
 	time.Sleep(1 * time.Millisecond)
 
 	token, err := client.Login(ctx, user)
 
-	// Should get an error due to timeout
 	assert.Error(t, err)
 	assert.Empty(t, token)
 }
@@ -369,7 +351,6 @@ func TestDataVault_Login_WithJWTValidation(t *testing.T) {
 
 	client := SetupTestClient(t, lis)
 
-	// Register a user first
 	user := models.User{
 		Login:    "jwtloginuser",
 		Password: "jwtloginpass",
@@ -377,13 +358,11 @@ func TestDataVault_Login_WithJWTValidation(t *testing.T) {
 	_, err := client.Register(context.Background(), user)
 	require.NoError(t, err)
 
-	// Test login with JWT validation
 	jwt, err := client.Login(context.Background(), user)
 	assert.NoError(t, err, "Login should succeed")
 	assert.NotEmpty(t, jwt, "JWT should not be empty")
 	assert.Contains(t, jwt, ".", "JWT should contain dots")
 
-	// Validate the returned JWT
 	mockServer := &MockVaultServer{
 		validateJWT: true,
 		jwtSecret:   jwtSecret,
@@ -408,15 +387,12 @@ func TestDataVault_Login_JWTConsistency(t *testing.T) {
 		Password: "consistentpass",
 	}
 
-	// Register user
 	registerJWT, err := client.Register(context.Background(), user)
 	require.NoError(t, err)
 
-	// Login with same user
 	loginJWT, err := client.Login(context.Background(), user)
 	require.NoError(t, err)
 
-	// Both JWTs should be valid and contain same login
 	mockServer := &MockVaultServer{
 		validateJWT: true,
 		jwtSecret:   jwtSecret,
@@ -430,6 +406,5 @@ func TestDataVault_Login_JWTConsistency(t *testing.T) {
 	assert.True(t, loginValid, "Login JWT should be valid")
 	assert.Equal(t, user.Login, loginLogin, "Login JWT should contain correct login")
 
-	// Both should contain the same login
 	assert.Equal(t, regLogin, loginLogin, "Both JWTs should contain same login")
 }
