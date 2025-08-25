@@ -15,6 +15,10 @@ func (c *Client) Register(ctx context.Context, user models.User) (string, error)
 		},
 	}
 
+	if user.Login == "" || user.Password == "" {
+		return "", ErrorRegister
+	}
+
 	grpcResp, err := c.ClientConn.Register(ctx, req)
 	if err != nil || !grpcResp.Success {
 		return "", ErrorRegister

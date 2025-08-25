@@ -2,6 +2,7 @@ package grpcclient
 
 import (
 	"context"
+	"errors"
 	"data-vault/client/internal/models"
 	"data-vault/client/internal/proto"
 
@@ -16,6 +17,10 @@ func (c *Client) GetData(ctx context.Context, jwt string) ([]models.Data, error)
 		"authorization": "Bearer " + jwt,
 	})
 	ctx = metadata.NewOutgoingContext(ctx, md)
+
+	if jwt == "" {
+		return nil, errors.New("JWT token is empty")
+	}
 
 	req := &proto.GetDataRequest{}
 

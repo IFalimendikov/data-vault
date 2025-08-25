@@ -15,6 +15,10 @@ func (c *Client) PostData(ctx context.Context, jwt, data string) error {
 	})
 	ctx = metadata.NewOutgoingContext(ctx, md)
 
+	if data == "" || jwt == "" {
+		return errors.New("data or JWT token is empty")
+	}
+
 	req := &proto.PostDataRequest{
 		Data: data,
 	}

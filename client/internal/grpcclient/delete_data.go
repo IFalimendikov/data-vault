@@ -15,6 +15,10 @@ func (c *Client) DeleteData(ctx context.Context, jwt, id string) error {
 	})
 	ctx = metadata.NewOutgoingContext(ctx, md)
 
+	if id == "" || jwt == "" {
+		return ErrorDelete
+	}
+
 	req := &proto.DeleteDataRequest{
 		Id: id,
 	}
