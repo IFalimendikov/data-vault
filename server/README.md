@@ -65,12 +65,6 @@ go build -o server cmd/main.go
 go test ./...
 ```
 
-Запуск тестов с покрытием:
-
-```bash
-go test -cover ./...
-```
-
 ## Структура проекта
 
 ```
