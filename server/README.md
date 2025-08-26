@@ -39,13 +39,6 @@ go mod tidy
 go run cmd/main.go
 ```
 
-### Производство
-
-```bash
-go build -o server cmd/main.go
-./server
-```
-
 ## API
 
 Сервер предоставляет следующие gRPC методы:
