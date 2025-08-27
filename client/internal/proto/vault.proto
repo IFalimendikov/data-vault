@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+package vault;
+
+option go_package = "internal/proto";
+
+// User related messages
+message User {
+  string login = 1;
+  string password = 2;
+}
+
+// Data related messages
+message Data {
+  string id = 1;
+  string user = 2;
+  string status = 3;
+  string type = 4;
+  bytes data = 5;
+  string uploaded_at = 6;
+}
+
+// Request/Response messages for operations
+message RegisterRequest {
+  User user = 1;
+}
+
+message RegisterResponse {
+  bool success = 1;
+  string jwt_token = 2; 
+}
+
+message LoginRequest {
+  User user = 1;
+}
+
+message LoginResponse {
+  bool success = 1;
+  string jwt_token = 2; 
+}
+
+message PostDataRequest {
+  string type = 1;
+  bytes data = 2;
+}
+
+message PostDataResponse {
+  bool success = 1;
+}
+
+message GetDataRequest {}
+
+message GetDataResponse {
+  repeated Data data = 1;
+}
+
+message DeleteDataRequest {
+  string id = 1;
+}
+
+message DeleteDataResponse {
+  bool success = 1;
+}
+
+message PingDBRequest {}
+
+message PingDBResponse {
+  bool success = 1;
+}
+
+// Main service definition
+service VaultService {
+  // User operations
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc PingDB(PingDBRequest) returns (PingDBResponse);
+  
+  // Data operations
+  rpc PostData(PostDataRequest) returns (PostDataResponse);
+  rpc GetData(GetDataRequest) returns (GetDataResponse);
+  rpc DeleteData(DeleteDataRequest) returns (DeleteDataResponse);
+}
